@@ -36,15 +36,20 @@ module.exports = {
     logo: "/image/touxiang.png",
     searchMaxSuggestions: 10,
     nav: [
-      { text: "开发中遇到的问题", link: "/" },
-      //   {
-      //     text: "博文",
-      //     items: [
-      //       { text: "Android", link: "/android/" },
-      //       { text: "ios", link: "/ios/" },
-      //       { text: "Web", link: "/web/" },
-      //     ],
-      //   },
+      {
+        text: "开发中遇到的问题",
+        link: "/",
+        items: [
+          { text: "HTML", link: "/html/" },
+          { text: "javascript", link: "/javascript/" },
+          { text: "typescript", link: "/typescript/" },
+          { text: "Vue", link: "/vue/" },
+          { text: "CSS", link: "/css/" },
+          { text: "Git", link: "/git/" },
+          // { text: "typescript", link: "/typescript/" },
+        ],
+      },
+
       { text: "微信", link: "/wechat/" },
       { text: "Github", link: "https://github.com/wuweiyuan" },
     ],
@@ -80,6 +85,10 @@ module.exports = {
           {
             title: "CSS",
             path: "/css/",
+          },
+          {
+            title: "Git",
+            path: "/git/",
           },
         ],
       },
