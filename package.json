@@ -1,0 +1,17 @@
+{
+  "name": "weiyuan",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "vuepress": "^1.7.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
