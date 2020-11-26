@@ -29,7 +29,7 @@ module.exports = {
           { text: "Vue", link: "/vue/" },
           { text: "CSS", link: "/css/" },
           { text: "Git", link: "/git/" },
-          // { text: "typescript", link: "/typescript/" },
+          { text: "nodeJs", link: "/nodeJs/" },
         ],
       },
 
@@ -72,6 +72,10 @@ module.exports = {
           {
             title: "Git",
             path: "/git/",
+          },
+          {
+            title: "nodeJs",
+            path: "/nodeJs/",
           },
         ],
       },
