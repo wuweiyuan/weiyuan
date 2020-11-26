@@ -68,7 +68,7 @@ cd /usr/local/nginx/sbin/
 ## liunx 安装 jenkins
 
 ::: tip
-1 .安装 java
+`1 .安装 java
 
 ```
 yum install -y java-1.8.0-openjdk.x86_64
@@ -157,6 +157,34 @@ npm -v
 npm install -g pm2
 ln -s ~/node-v9.3.0-linux-x64/bin/pm2 /usr/bin/pm2
 pm2 -v
+```
+
+:::
+
+## jenkins8080 端口网页打不开
+
+::: tip 1.查看是否开启防火墙
+
+```
+systemctl status firewalld
+```
+
+2.查看是否开放端口 8080
+
+```
+firewall-cmd --list-ports
+```
+
+3.没有开放，则加入
+
+```
+firewall-cmd --permanent --zone=public --add-port=8080/tcp
+```
+
+4.重启防火墙
+
+```
+systemctl reload firewalld
 ```
 
 :::
