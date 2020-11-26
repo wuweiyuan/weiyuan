@@ -1,4 +1,4 @@
-# git 上传如何忽略 node_modules
+## git 上传如何忽略 node_modules
 
 git 上传如何忽略 node_modules，需要的就是.gitignore 文件了
 

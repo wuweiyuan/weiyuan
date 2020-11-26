@@ -30,6 +30,7 @@ module.exports = {
           { text: "CSS", link: "/css/" },
           { text: "Git", link: "/git/" },
           { text: "nodeJs", link: "/nodeJs/" },
+          { text: "linux", link: "/linux/" },
         ],
       },
 
@@ -76,6 +77,10 @@ module.exports = {
           {
             title: "nodeJs",
             path: "/nodeJs/",
+          },
+          {
+            title: "linux",
+            path: "/linux/",
           },
         ],
       },

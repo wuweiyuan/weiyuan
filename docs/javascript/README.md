@@ -1,4 +1,4 @@
-# call，apply，bind 的用法以及区别
+## call，apply，bind 的用法以及区别
 
 ::: tip
 这里面讲得很详细
@@ -9,7 +9,7 @@ https://www.cnblogs.com/kerwin1727/p/11433762.html
 https://www.cnblogs.com/lfri/p/11872696.html
 :::
 
-# 闭包
+## 闭包
 
 ::: tip
 一、闭包是什么?
