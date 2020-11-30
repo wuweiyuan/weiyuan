@@ -44,3 +44,72 @@ https://www.cnblogs.com/lfri/p/11872696.html
 3. 参数和变量不会被回收。
 
 :::
+
+## Babel 可以把 es6 及之后的语法转化为 es5，从而所有浏览器能够适配（webpack）
+
+## Object.freeze 冻结对象（不能添加属性和改变值）
+
+::: tip
+`
+
+```js
+const obj = {
+  name: "weiyuan",
+  age: 25,
+  kill: {
+    age: 11,
+  },
+};
+Object.freeze(obj);
+// Object.freeze(obj.kill)
+console.log(obj);
+obj.school = "baiyuan";
+obj.name = "wuweiyuan";
+obj.kill.age = "12";
+console.log(obj);
+//注意这里obj.kill.age是12，所以这里是浅冻结，要冻结kill，要再使用Object.freeze(obj.kill);
+```
+
+:::
+
+## 对象解构赋值用其他名字
+
+```js
+let obj = { name: "weiyuan", age: 10 };
+let { name: a, age: b } = obj;
+console.log(a, b);
+```
+
+## for 和 forEach 循环区别，在 for 循环中 break 和 continue 可用，而 forEach 不可用
+
+## map 循环返回新数组不会改变原数组
+
+```js
+let arr = [1, 2, 3];
+let result = arr.map((item) => {
+  return item + 1;
+});
+console.log(arr, result);
+```
+
+## some 返回的是一个波尔值有一个符合为 true
+
+```js
+let arr = [1, 2, 3];
+let result = arr.some((item) => {
+  item == 2;
+});
+console.log(arr, result);
+```
+
+## every 返回的是一个波尔之，每一个符合为 true
+
+## find 返回的是第一个通过测试的元素(findIndex 也是第一个通过测试)
+
+```js
+let arr = [1, 2, 3, 4, 2];
+let result = arr.find((item) => {
+  return item == 2;
+});
+//这个是第一个2
+```
