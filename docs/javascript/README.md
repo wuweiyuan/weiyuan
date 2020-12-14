@@ -113,3 +113,340 @@ let result = arr.find((item) => {
 });
 //这个是第一个2
 ```
+
+## 伪数组（dom 元素,arguments）转化为真数组
+
+```js
+let div s= document.querySelectorAll('.xx')
+let  arr = Array.prototype.slice.call(divs)//es5
+let arr = Array.from(divs)//es6
+
+```
+
+## 箭头函数不可以当作构造函数和不可以使用 arguments
+
+## es6 类的继承
+
+```js
+    class Person{
+        this.sex
+        get sex(){
+            return this._sex
+        }
+        set sex(val){
+            this._sex = val
+        }
+        constructor(name,age){
+            this.name = name
+            this.age = age
+            this._sex = ''
+        }
+    }
+
+    class Weiyuan extends Person{
+        constructor(name,age,company){
+            //关键字
+            super(name,age)
+            this.company = company
+        }
+    }
+```
+
+## symbol
+
+```js
+let s1 = Symbol("fpp");
+```
+
+## set 里面的值都是唯一的
+
+```js
+let arr = new Set([1, 2, 3, 2]);
+//加数据，可以链式操作
+arr.add(5).add(7);
+//删除数据
+arr.delete(1);
+//清空
+arr.clear();
+//是否有某一个值
+arr.has(2);
+//有几个值
+arr.size;
+//可以遍历
+
+//数组合并去重
+let arr1 = [1, 3, 4, 5, 7];
+let arr2 = [2, 3, 5, 89];
+let s = new Set([...arr1, ...arr2]);
+//变成数组
+let array = [...s];
+let array = Array.from(s);
+//交集
+let s1 = new Set(arr1);
+let s2 = new Set(arr2);
+let s = new Set(arr1.filter((item) => s2.has(item)));
+```
+
+## map 数据类型
+
+```js
+let m = new Map();
+let obj = {
+  name: "weiyuan",
+};
+m.set(obj, "es");
+//console.log(m.get(obj))
+//m.delete(obj)
+console.log(m);
+m.has(obj);
+m.size;
+//遍历
+//forEach前面是value后面是key
+m.forEach((value, key) => {
+  console.log(value, key);
+});
+//for of遍历 前面是key后面是value
+for (let [key, value] of m) {
+}
+//map性能比对象要好
+```
+
+## 进制运算
+
+```js
+//十进制-》二进制
+const a = 5; //101
+console.log(a.toString(2));
+//二进制转化为十进制
+const b = 101;
+console.log(parseInt(b, 2));
+//0B二进制 0O八进制
+const a = 0b0101;
+console.log(a);
+const b = 0o777;
+console.log(b);
+//判断是不是整数
+Number.isInteger(5.5);
+```
+
+## Proxy
+
+```js
+let arr = [7, 8, 9];
+arr = new Proxy(arr, {
+  get(target, prop) {
+    console.log(target, prop);
+    return prop in target ? target[prop] : "error";
+  },
+});
+console.log(arr[1]);
+console.log(arr[10]);
+
+//has
+let range = {
+  start: 5,
+  end: 10,
+};
+rang = new Proxy(range, {
+  has(target, prop) {
+    return prop >= target.start && prop <= target.end;
+  },
+});
+console.log(2 in range);
+
+//
+let userInfo = {
+  name: "weiyuan",
+  age: 28,
+  _password: "*****",
+};
+userInfo = new Proxy(userInfo, {
+  ownKeys(target) {
+    return Object.keys(target).filter((item) => {
+      return !item.startsWith("_");
+    });
+  },
+});
+for (let key in userInfo) {
+  console.log(key);
+}
+console.log(Object.keys(userInfo));
+
+let sum = (...argus) => {
+  let num = 0;
+  argus.forEach((item) => {
+    num += item;
+  });
+  return num;
+};
+sum = new Proxy(sum, {
+  apply(target, ctx, args) {
+    console.log(target);
+    return target(...args) * 2;
+  },
+});
+console.log(sum(1, 2));
+```
+
+## ajax 原理
+
+```js
+var url = "";
+function ajax(url, callback) {
+  var xmlhttp;
+  //1，创建XMLHttpRequest对象
+  if (window.XMLHttpRequest) {
+    xmlhttp = new XMLHttpRequest();
+  } else {
+    //兼容早期浏览器
+    smlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+  }
+  //2.发送请求
+  xmlhttp.open("GET", url, true);
+  xmlhttp.send();
+  //3.服务端响应
+  xmlhttp.onreadystatechange = function() {
+    if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+      var obj = JSON.parse(xmlhttp.responseText);
+      console.log(obj);
+      callback(obj);
+    }
+  };
+}
+
+ajax(url, (res) => {
+  console.log(res);
+});
+```
+
+## promise
+
+```js
+let p = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    console.log("dingshiqi");
+    // resolve()
+    reject();
+    //如果要在下面的then显示的话，需要把数据写进括号里面。例如resolve({name:weiyuan})
+  });
+}).then(
+  (res) => {
+    console.log("成功", res);
+  },
+  () => {
+    console.log("失败");
+  }
+);
+```
+
+## promise.race([func1,func2]) 那个先抛出 resolve 或者 reject，就先显示哪一个
+
+## Generator
+
+```js
+function* foo() {
+  for (let i = 0; i < 3; i++) {
+    yield i;
+  }
+}
+let f = foo();
+console.log(foo.next());
+console.log(foo.next());
+console.log(foo.next());
+console.log(foo.next());
+```
+
+## Module
+
+:::tip
+一个 js 只能有一个 export default <br>
+export 可以有多个
+
+import 如果是 export 的，变量名一定要一样,而且要写括号，export default 的名字可以不一样 <br>
+改名 可以用 as 例如 import a as b from './a.js'
+:::
+
+## includes
+
+```js
+var arr = ["es5", "es6", "es7"];
+//可以接收两个参数，第一个参数是要查找的内容，第二个参数是从哪个索引开始查找
+arr.includes("es6", 2); //false
+arr.includes("es6", 1); //true
+// 只能判断基本类型，不能判断引用类型
+const a = ["es5", ["es6", "es7"], "es8"];
+a.includes(["es6", "es7"]); //false
+a.indexOf(["es6", "es7"]); //-1
+```
+
+## 幂运算符
+
+```js
+//幂运算符:** (es7)等同于 Math.pow()
+//2的10次方
+Math.pow(2, 10);
+2 ** 10;
+```
+
+:::
+
+## await 要写在 async 函数里面
+
+## 静态方法和实例方法
+
+```js
+Object.values(); //静态
+let arr = [1, 3];
+arr.includes(1); //实例方法
+```
+
+## 各属性说明
+
+<img src='/image/object.png' />
+<img src='/image/object1.png' />
+
+```js
+//value 默认值
+//writable 是否课修改
+//enumerable 是否可遍历
+//configurable  能否用delete删除
+```
+
+## Date 中的时间格式 format
+
+```js
+// 对Date的扩展，将 Date 转化为指定格式的String
+// 月(M)、日(d)、小时(H)、分(m)、秒(s)、季度(q) 可以用 1-2 个占位符，
+// 年(y)可以用 1-4 个占位符，毫秒(S)只能用 1 个占位符(是 1-3 位的数字)
+// 例子：
+// (new Date()).Format("yyyy-MM-dd HH:mm:ss.S") ==> 2006-07-02 08:09:04.423
+// (new Date()).Format("yyyy-M-d H:m:s.S")      ==> 2006-7-2 8:9:4.18
+Date.prototype.Format = function(fmt) {
+  //author: meizz
+  var o = {
+    "M+": this.getMonth() + 1, //月份
+    "d+": this.getDate(), //日
+    "h+": this.getHours(), //小时
+    "m+": this.getMinutes(), //分
+    "s+": this.getSeconds(), //秒
+    "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+    S: this.getMilliseconds(), //毫秒
+  };
+  if (/(y+)/.test(fmt))
+    fmt = fmt.replace(
+      RegExp.$1,
+      (this.getFullYear() + "").substr(4 - RegExp.$1.length)
+    );
+  for (var k in o)
+    if (new RegExp("(" + k + ")").test(fmt))
+      fmt = fmt.replace(
+        RegExp.$1,
+        RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length)
+      );
+  return fmt;
+};
+//调用方法
+var time1 = new Date().Format("yyyy-MM-dd HH:mm:ss");
+
+var time2 = new Date().Format("yyyy-MM-dd");
+```
