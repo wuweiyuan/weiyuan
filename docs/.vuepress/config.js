@@ -49,6 +49,7 @@ module.exports = {
         title: "开发中遇到的问题",
         sidebarDepth: 2,
         path: "/",
+        collapsable: false,
         children: [
           {
             title: "HTML",

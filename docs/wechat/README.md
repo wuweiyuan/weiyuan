@@ -2,7 +2,7 @@
 
 <img style='width:300px' src='/image/Wechat.png'/>
 
-<div>shenmewanyi</div>
+<!-- <div>shenmewanyi</div>
 
 # shfjsahf
 
@@ -23,7 +23,7 @@ const s: string = "s";
 // console.log("你好，VuePress！");
 ```
 
-:::
+::: -->
 
 # dfd
 
