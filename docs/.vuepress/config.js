@@ -23,7 +23,7 @@ module.exports = {
         text: "开发中遇到的问题",
         link: "/",
         items: [
-          { text: "HTML", link: "/html/" },
+          // { text: "HTML", link: "/html/" },
           { text: "javascript", link: "/javascript/" },
           { text: "typescript", link: "/typescript/" },
           { text: "Vue", link: "/vue/" },
@@ -51,10 +51,10 @@ module.exports = {
         path: "/",
         collapsable: false,
         children: [
-          {
-            title: "HTML",
-            path: "/html/",
-          },
+          // {
+          //   title: "HTML",
+          //   path: "/html/",
+          // },
           {
             title: "javascript",
             path: "/javascript/",
