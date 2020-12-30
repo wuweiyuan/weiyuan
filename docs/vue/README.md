@@ -28,6 +28,16 @@ const store = new Vuex.Store({
       }, 1000);
     },
   },
+  //Getter用于对store中的数据进行加工处理形成新的数据
+  //不会修改源数据
+  //有包装数据的作用
+  //类似vue的计算性属性
+  //store中的数据发生变化，getter的数据也会跟着变化
+  getters: {
+    showNumber(state) {
+      return "当前最新的数量是" + state.count;
+    },
+  },
 });
 ```
 
@@ -89,4 +99,16 @@ this.add()
   methods:{
     ...mapAction([addSync])
   }
+```
+
+## 使用 getter 的方式
+
+```js
+//第一种
+this.$store.getters.名称
+//第二种
+import  {mapGetters} from 'vuex'
+computed:{
+   ...mapGetters(['showNumber'])
+}
 ```

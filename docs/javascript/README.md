@@ -406,6 +406,8 @@ arr.includes(1); //实例方法
 <img src='/image/object1.png' />
 
 ```js
+let obj = { name: "wwy" };
+Object.getOwnPropertyDescriptors(obj);
 //value 默认值
 //writable 是否课修改
 //enumerable 是否可遍历
@@ -449,4 +451,14 @@ Date.prototype.Format = function(fmt) {
 var time1 = new Date().Format("yyyy-MM-dd HH:mm:ss");
 
 var time2 = new Date().Format("yyyy-MM-dd");
+```
+
+## String.prototype.padStart() String.prototype.padEnd() 填充字符串
+
+```js
+//月份需不需要加0平时要用到
+let str = "qwe";
+//8是总的多少位，‘1’是可选的，默认是‘’，
+str.padStart(6, "1");
+//111qwe
 ```
