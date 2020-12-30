@@ -4,3 +4,6 @@
 这个是个人博客，在这里写下自己平时开发中遇到的一些问题！!
 
 :::
+<ClientOnly>
+<buttom-view></buttom-view>
+</ClientOnly>
