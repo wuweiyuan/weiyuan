@@ -25,11 +25,17 @@ const s: string = "s";
 
 ::: -->
 
-# dfd
+<!-- # dfd
 
 ```ts
 const s: string = "s";
 // console.log("你好，VuePress！");
-```
+``` -->
 
-<span v-for="i in 3">{{ i }} </span>
+<!-- <span v-for="i in 3">{{ i }} </span> -->
+
+<!-- <ClientOnly> -->
+
+<buttom-view></buttom-view>
+
+<!-- </ClientOnly> -->

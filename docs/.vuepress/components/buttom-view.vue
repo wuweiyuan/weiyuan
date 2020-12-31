@@ -10,6 +10,7 @@ export default {};
 
 <style lang="css">
 .buttom-view {
+  margin-top: 50px;
   text-align: center;
 }
 </style>

@@ -462,3 +462,7 @@ let str = "qwe";
 str.padStart(6, "1");
 //111qwe
 ```
+
+<ClientOnly>
+<buttom-view></buttom-view>
+</ClientOnly>
