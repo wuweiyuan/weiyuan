@@ -112,3 +112,14 @@ computed:{
    ...mapGetters(['showNumber'])
 }
 ```
+
+## vue 按需加载组建
+
+```js
+//这个是在路由里面实现的
+{
+  path:'/wwy',
+  name:'wwy',
+  component:()=>import('../views/wwy.vue')//关键代码
+}
+```

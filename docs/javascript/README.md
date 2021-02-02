@@ -463,6 +463,109 @@ str.padStart(6, "1");
 //111qwe
 ```
 
+## 拷贝数据
+
+```js
+const obj1 = {
+  name: "weiyuan",
+  age: 11,
+};
+const obj2 = { ...obj1 };
+```
+
+## 对象剩余属性 rest
+
+```js
+const obj = {
+  name: "weiyuan",
+  age: "2",
+  school: "baiyun",
+};
+//...rest必须放在最后一个
+const { name, ...rest } = obj;
+```
+
+## Promise.prototype.finally()
+
+## Object.fromEntries()
+
+```js
+const obj = {
+  name: "weiyuan",
+  age: 12,
+};
+const entries = Object.entries(obj);
+console.log(entries);
+//es10
+const formEntries = Object.formEntries(entries);
+console.log("值跟obj一样", formEntries);
+
+//map对象转化为对象也可以用formEntries
+const map = new Map();
+map.set("name", "weiyuan");
+map.set("age", 12);
+console.log(map);
+const formEntries = Object.formEntries(map);
+console.log(formEntries);
+```
+
+## String.prototype.trimStart() ，String.prototype.trimEnd()
+
+```js
+var str = "    wwy   ";
+//去除前面的空格
+console.log(str.trimStart());
+//去除后面的空格
+console.log(str.trimEnd());
+//去掉前后的空格
+console.log(str.trim());
+```
+
+## Array.prototype.flat()，Array.prototype.flatMap()
+
+```js
+//数组开平
+var arr = [1, 2, [3, 4, 5, [6, 7]]];
+//flat（）扁平一次，可以链式操作
+console.log(arr.flat().flat());
+//可传参数相当于扁平两次
+console.log(arr.flat(2));
+console.log(arr.flat(Infinity));
+
+var arr = [1, 2, 3, 4];
+var res = arr.map((x) => [x + 1]).flat();
+//等于下面的
+var res = arr.flapMap((x) => [x + 1]);
+```
+
+## Symbol.prototype.description
+
+```js
+var s = Symbol("wuweiyuan");
+console.log(s);
+console.log(s.description); //只读属性
+```
+
+## Promise.allSettled()跟 Promise.all 的区别
+
+```js
+//区别在于all其中一个是reject就进入catch，而allSettlted都进入then
+```
+
+<img src="/image/promise(allSettled).jpg" />
+
+## 空值合并运算符：Nullish coalescing Operator
+
+```js
+var a = 0;
+var b = a || 5;
+//b = 5
+
+var a = 0;
+var b = a ?? 5;
+//b = 0 只有undefined和null才取5
+```
+
 <ClientOnly>
 <buttom-view></buttom-view>
 </ClientOnly>
