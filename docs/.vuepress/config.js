@@ -32,6 +32,7 @@ module.exports = {
           { text: "linux", link: "/linux/" },
           { text: "HTML", link: "/html/" },
           { text: "OSS", link: "/OSS/" },
+          { text: "webpack", link: "/webpack/" },
         ],
       },
 
@@ -87,6 +88,10 @@ module.exports = {
           {
             title: "OSS",
             path: "/OSS/",
+          },
+          {
+            title: "webpack",
+            path: "/webpack/",
           },
         ],
       },
