@@ -1,5 +1,6 @@
 # 二维码
 
+里面有内容写错，或者有技术要探讨的可以加微信联系，谢谢！
 <img style='width:300px' src='/image/Wechat.png'/>
 
 <!-- <div>shenmewanyi</div>
@@ -34,8 +35,6 @@ const s: string = "s";
 
 <!-- <span v-for="i in 3">{{ i }} </span> -->
 
-<!-- <ClientOnly> -->
-
+<ClientOnly>
 <buttom-view></buttom-view>
-
-<!-- </ClientOnly> -->
+</ClientOnly>
