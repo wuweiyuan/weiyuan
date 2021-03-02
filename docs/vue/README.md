@@ -123,3 +123,61 @@ computed:{
   component:()=>import('../views/wwy.vue')//关键代码
 }
 ```
+
+## vue3 中，如果使用了 reactive，如果需要响应式，应该还需再用 toRefs
+
+```js
+const data: DataInter = reactive({
+  count: 0,
+  doubule: computed(() => {
+    return data.count * 2;
+  }),
+  onClick: () => {
+    data.count++;
+  },
+});
+const refData = toRefs(data);
+```
+
+## vue3 和 vue2 生命周期的变化
+
+<img src='/image/vue3life.png'/>
+
+## vue3 onRenderTriggered 可以监视数据的变化(类似一个生命周期)
+
+```js
+onRenderTriggered((event) => {
+  console.log(event);
+});
+```
+
+## vue3watch 使用
+
+```js
+//aaa是监听的变量
+watch(aaa,(new,old)=>{
+
+})
+//也可以同时监听两个变量
+watch([aaa,bbb],()=>{
+
+})
+//如果要监听reactive中的某一个值。z这样才不会报错
+watch([aaa,()=>data.count],()=>{
+
+})
+```
+
+## vue3 teleport 瞬间移动
+
+```js
+//可以把弹窗挂载在其他dom节点（音乐有些弹窗在很深的子组件里面，可以让它挂在外面的dom），避免被污染
+//mount为外面id为mount的dom节点
+<teleport to="mount">//这里面是要挂载的组件</teleport>
+```
+
+## Suspense 是 vue3 推出的一个内置的特殊的组件，需要返回一个 promise
+
+<img src='/image/suspensePromise.png'/>
+可以显示接口还没返回时，需要显示的内容，而且#default里面可以包裹多个组件，等全部接口都完成，再一起显示
+<img src='/image/suspenseHtml.png'/>
