@@ -179,5 +179,5 @@ watch([aaa,()=>data.count],()=>{
 ## Suspense 是 vue3 推出的一个内置的特殊的组件，需要返回一个 promise
 
 <img src='/image/suspensePromise.png'/>
-可以显示接口还没返回时，需要显示的内容，而且#default里面可以包裹多个组件，等全部接口都完成，再一起显示
+可以显示接口还没返回时，需要显示的内容，而且#default里面可以包裹多个组件，等全部接口都完成，再一起显示。
 <img src='/image/suspenseHtml.png'/>
