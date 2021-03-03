@@ -207,5 +207,5 @@ return{
 inheritAttrs:false,
 //这个属性跟setup同级
 //最后
-input v-model='input' :bind='$artts'></input>
+input v-model='input' :bind='$arttss'></input>
 ```
