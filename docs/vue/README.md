@@ -181,3 +181,31 @@ watch([aaa,()=>data.count],()=>{
 <img src='/image/suspensePromise.png'/>
 可以显示接口还没返回时，需要显示的内容，而且#default里面可以包裹多个组件，等全部接口都完成，再一起显示。
 <img src='/image/suspenseHtml.png'/>
+
+## vue3获取节点
+```js
+//例如html
+<div ref='dom'></div>
+//则在setup需要
+const dom = ref<null|HTMLElement>(null)
+return{
+  dom
+}
+//之后在setup里面，就可以通过dom.value获取到dom节点
+```
+
+## vue3自定义组件属性如何传到组件内部想要的dom节点上
+```js
+//例如这是组件
+<my-input placeholder='请输入文字' type='text'></my-input>
+//组件的html
+<div class='myClass'>
+  <input v-model='input'></input>
+</div>
+//如何把placeholder='请输入文字' type='text'弄进input这个dom节点呢
+//首先设置
+inheritAttrs:false,
+//这个属性跟setup同级
+//最后
+input v-model='input' :bind='$artts'></input>
+```
