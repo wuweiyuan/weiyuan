@@ -209,3 +209,86 @@ inheritAttrs:false,
 //最后
 input v-model='input' :bind='$arttss'></input>
 ```
+
+## vue3获取路由信息
+```js
+import { useRoute } from 'vue-router'
+setup(){
+  const route = useRoute()
+  console.log(route)
+}
+```
+
+## vue3获取vuex
+```js
+import { useStore } from 'vuex'
+ const store = useStore()
+```
+
+
+## 导航守卫
+```js
+const router = new VueRouter({ ... })
+//to: Route: 即将要进入的目标 路由对象
+//from: Route: 当前导航正要离开的路由
+//next: Function: 一定要调用该方法来 resolve 这个钩子。执行效果依赖 next 方法的调用参数。调用了才能跳转页面
+router.beforeEach((to, from, next) => {
+  // ...
+})
+```
+
+## 路由元信息
+```js
+//定义路由的时候可以配置 meta 字段
+const router = new VueRouter({
+  routes: [
+    {
+      path: '/foo',
+      component: Foo,
+      children: [
+        {
+          path: 'bar',
+          component: Bar,
+          // a meta field
+          meta: { requiresAuth: true }
+        }
+      ]
+    }
+  ]
+})
+//那么如何访问这个 meta 字段呢
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    // this route requires auth, check if logged in
+    // if not, redirect to login page.
+    if (!auth.loggedIn()) {
+      next({
+        path: '/login',
+        query: { redirect: to.fullPath }
+      })
+    } else {
+      next()
+    }
+  } else {
+    next() // 确保一定要调用 next()
+  }
+})
+```
+
+## axios.defaults.baseURL
+```js
+//使用axios后，因为调用接口，接口前面的hostname很多都是一样的，可以用到axios的一个配置
+axios.defaults.baseURL ='https://apis.wwy.com/api/'
+//之后调用就简单很多
+axios.get('/sd?id=1').then(res=>{
+  console.log(res)
+})
+```
+
+## 把token设置在头部信息
+```js
+//登录时需要把token穿在header上
+axios.defaults.headers.common.Authorization = `Bearer ${token}`
+//浏览器存token
+localStorage.setItem('token',token)
+```
