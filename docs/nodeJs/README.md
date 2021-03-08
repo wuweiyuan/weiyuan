@@ -19,6 +19,7 @@ const server = http.createServer((req,res)=>{
     console.log('method:', req.method)
     const url= req.url
     console.log('url:url',url)
+    const path = url.split('?')[0]//路由
     req.query = querystring.parse(url.split('?')[1])
     console.log('query:',req.query)
     res.end(JSON.stringify(req.query))
@@ -33,7 +34,9 @@ const http = require('http')
 const server = http.createServer((req,res)=>{
     if(req.method=="POST"){
         console.log(req.headers["content-type"])
-        let postData = ''
+        let postData = '';
+        //设置返回格式JSON
+        res.setHeader('Content-type','application/json')
         req.on("data",chunk=>{
             postData += chunk.toString()
             console.log('chunk',chunk.toString())
@@ -46,4 +49,189 @@ const server = http.createServer((req,res)=>{
 })
 server.listen(3000)
 //post请求，只能通过postman模拟，浏览器模拟不了
+```
+
+
+## nodemon可以监听文件变化
+```js
+npm install nodemon --save-dev
+//然后在package.json
+"script":{
+    dev:"nodemon index.js"
+}
+```
+
+## cross-en是一款运行跨平台设置和使用环境变量的脚本
+```js
+npm install --save-dev cross-env
+//然后在package.json
+ "script":{
+    dev:"cross-env NODE_ENV=dev nodemon index.js"
+}
+//可以通过process.env.NODE_ENV修改
+```
+
+## 为命中路由
+```js
+    res.writeHeade(404,{"Content-type":"text-plain"})
+    res.write("404 Not found/n")
+    res.end()
+```
+
+## 读取文件
+```js
+//简单的nodejs读取文件
+const fs = require('fs')
+const path = require('path')
+//files文件夹名a.json是文件名
+const fullFileName = path.resolve(__dirname,'files','a.json')
+fs.readFile(fullFileNamw,(err,data)=>{
+    if(err){
+        console.erroe(err)
+        return
+    }
+    console.log(data.toString())
+})
+```
+
+## 安装mysql
+```js
+//1.https://dev.mysql.com/downloads/mysql/
+//2.https://dev.mysql.com/downloads/workbench/
+```
+
+## sql笔记
+```js
+//有一列名为password，这个是关键字，直接使用的话会报错，所以可以用``包起来，这样就不会报错了
+insert into users(username,`password`,realname) values ('lisi','123','李四');
+// 模糊查询
+select * from users where username like '%li%';
+//排序
+select * from users where username like '%li%' order by id desc;
+//更新
+update users set username='zhangsan' where id='1';
+//如果更新报错
+SET SQL_SAFE_UPDATEA=0;
+//删除(其实现实中一般 都是软删除)
+delete from users where id='1';
+```
+
+## nodejs操作数据库
+```js
+//首先要安装musql的依赖
+npm i mysql;
+//之后就执行下面命令
+const mysql = require('mysql')
+const con = mysql.createConnection({
+    host:'localhost',//可以写本地，如果是线上的就写线上的地址,
+    user:'root',
+    password:'',//自己的密码必填
+    port:3306,//端口号
+    database:'myblog'
+})
+//开始连接
+con.connect();
+
+//执行sql语句
+const sql = 'select * from users';
+con.query(sql,(err,result)=>{
+    if(err){
+        console.error(err);
+        return
+    }
+    console.log('结果',result)
+})
+
+//关闭连接（现实中项目不用关闭，只是这里是demo所以关闭）
+con.end()
+```
+
+## server端nodejs操作cokkie
+```js
+     const http = require('http')
+     const  querystring= require('querystring')
+     //获取cookie过期时间
+    const getCookieExpires = () =>{
+        const d = new Date()
+        d.setTime = d.getTime() + (24 * 60 * 60 * 1000)
+        console.log('d.toUTCString()',d.toUTCString())
+        return d.toUTCString()
+    }
+    const server = http.createServer((req,res)=>{
+    //操作cookie设置cookie
+    res.setHeader('Set-Cookie',`username=wwu;path=/;httpOnly;expires=${getCookieExpires()}`)//这里/是根路由，在根路由下都生效,这样就可以在浏览器看到效果
+    //httpOnly这个值很重要，设置了这个属性，前端就不能修改cookie，只能在服务端修改，而且在前端也看不懂cookie值
+    //expires设置cookie过期时间
+
+
+
+    //服务端获取cookie
+    req.cookie = {};
+    const cookie = req.headers.cookie || '';//解析cookie  k1=v1;k2=v2;
+    cookie.split(';').forEach(item=>{
+        if(!item){
+            return
+        }
+        const arr = item.split('=')
+        const key = arr[0].trim()
+        const val = arr[1].trim()
+        req.cookie[key] = val
+    })
+    //要看到cookie，可以在浏览器控制台执行document.cookie = 'name=wwy'当然这是不可取的，还是要在server执行cookie
+
+    console.log('看看cookie是什么',req.cookie)
+    res.end(JSON.stringify(req.query))
+})
+```
+
+
+## session
+```js
+    //设置值
+    req.session.name='wwy';
+    req.session.realName='吴伟元';
+```
+
+## redis(一般是用来存取session)
+```js
+//安装
+brew install redis
+//开启redis服务
+redis-server
+//在打开一个终端
+redis-cli
+//使用redis,可以直接在终端执行。例如
+//设置
+set myname wuweiyuan
+//查看
+get myname
+//看所有的key
+keys *
+//删除自己设置的key
+del myname
+```
+
+## nodejs连接redis
+```js
+//先安装依赖
+npm install redis --save
+const redis = require('redis');
+
+//创建客户端 6397是redis端口号，127.0.0.1是本地地址，如果是线上就写线上的地址
+const redisClient = redis.createClient(6379,"127.0.0.1")
+redisClient.on('error',err=>{
+    console.error(err)
+})
+
+//测试 myname是key wuweiyuian是val redis.print是设置完成后打印看是不是正确（控制台打印的是Reply:OK）
+redisClient.set('myname','wuweiyuan',redis.print)
+redisClient.get('myname',(err,val)=>{
+    if(err){
+        console.error(err)
+        return
+    }
+    console.log('val',val)
+    redisClient.quit()//退出  只是demo要退出，现实中的项目就不要退出了
+
+})
 ```

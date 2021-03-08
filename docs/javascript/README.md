@@ -1,4 +1,4 @@
-## call，apply，bind 的用法以及区别
+<!-- ## call，apply，bind 的用法以及区别
 
 ::: tip
 这里面讲得很详细
@@ -7,7 +7,7 @@ https://www.cnblogs.com/kerwin1727/p/11433762.html
 箭头函数和 this
 <br>
 https://www.cnblogs.com/lfri/p/11872696.html
-:::
+::: -->
 
 ## 闭包
 
@@ -564,6 +564,42 @@ var b = a || 5;
 var a = 0;
 var b = a ?? 5;
 //b = 0 只有undefined和null才取5
+```
+
+## js使用require 和 import 引入依赖的区别
+```js
+//1.require是Commonjs的规范，node应用是由模块组成的，遵从commonjs的规范。用法：
+//a.js
+function test (args) {
+  // body...
+  console.log(args);	
+}
+ 
+module.exports = {
+  test
+}
+//b.js
+let { test } = require('./a.js');
+ 
+test('this is a test.');
+
+//2.import是es6为js模块化提出的新的语法，import （导入）要与export（导出）结合使用。用法：
+//a.js
+export function test (args) {
+  // body...
+  console.log(args);	
+}
+ 
+// 默认导出模块，一个文件中只能定义一个
+export default function() {...};
+ 
+export const name = "lyn";
+————————————————
+//b.js
+// _代表引入的export default的内容
+import _, { test, name } from './a.js';
+ 
+test(`my name is ${name}`);
 ```
 
 <ClientOnly>
