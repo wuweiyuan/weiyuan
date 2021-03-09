@@ -235,3 +235,48 @@ redisClient.get('myname',(err,val)=>{
 
 })
 ```
+
+## 使用nginx
+```js
+//下载
+brew install nginx
+//打开nginx配置(终端打开)
+sudo vi /usr/local/etc/nginx/nginx.conf
+//重要在编辑模式中，按先按esc键，在输入:wq就可退出编辑模式了
+//测试配置文件格式是否正确(没权限就要在前面加sudo)
+nginx -t
+//启动
+nginx;
+//重启
+nginx -s reload
+//停止
+nginx -s stop
+
+```
+
+## nodejs文件操作
+```js
+    
+    const fs = require('fs')
+    const path = require('path')
+    const fileName = path.resolve(__dirname,'data.text')
+
+    //读取文件
+    fs.readFile(fileName,(err,data)=>{
+        if(err){
+            console.error(err);
+            return
+        }
+        //因为data是二进制的，所以要toString
+        console.log(data.toString())
+    })
+
+    //写入文件
+    const content = '这是要写入的新内容\n'
+    const opt ={
+        flag:"a"//"a"是追加写入，覆盖用“w”
+    }
+    fs.writeFile(fileName,content,opt,(err)=>{
+        console.error(err)
+    })
+```
