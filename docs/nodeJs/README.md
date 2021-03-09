@@ -279,4 +279,156 @@ nginx -s stop
     fs.writeFile(fileName,content,opt,(err)=>{
         console.error(err)
     })
+
+     //判断文件是否存在
+    fs.exists(fileName,(exists)=>{
+        console.log('exists',exists)
+    })
+```
+
+## nodejs stream
+```js
+//我所了解的有这两种，通过pipe连起来
+ process.stdin.pipe(process.stdout)
+ req.pipe(res)
+//复制文件使用流
+const fs = require('fs')
+const path = require('path')
+
+const fileName1 = path.resolve(__dirname,'data.txt');
+const fileName2 = path.resolve(__dirname,'data-cop.txt');
+const redStream = fs.createReadStream(fileName1);
+const writeStream = fs.createWriteStream(fileName2)
+redStream.pipe(writeStream)
+redStream.on('data',data=>{
+    console.log('data',data.toString())
+})
+redStream.on('end',()=>{
+    console.log('已拷贝完')
+})
+```
+
+## 了解readline
+
+## 防sql注入
+```js
+const mysql =require('mysql')
+mysql.escape('这里面就是浏览器传进来的数据（变量）')
+```
+
+## 密码加密
+```js
+    //这个是nodejs自带的
+    const crypto = require('crypto')
+    const SECRET_KEY = 'WJiol_8776#'//密钥，自己写
+    //md5加密
+    function md5(content){
+        let md5 = crypto.createHash('md5')
+        return md5.update(content).digest('hex')
+    }
+
+    //加密函数
+    function genPassword(password){
+        const str = `password=${password}&key=${SECRET_KEY}`;
+        return md5(str)
+    }
+
+
+    const result = genPassword('123')
+    console.log('result',result)
+    //所以数据库要存加密过的密码
+```
+
+## 安装express
+```js
+sudo npm install express-generator -g
+//生成项目
+express blog-express
+```
+
+## express中间件理解
+```js
+//通过浏览器调试，大概知道什么是中间件了
+const express = require('express')
+
+//本次http请求实例
+const app = express()
+
+app.use((req,res,next)=>{
+    console.log('请求开始',req.method,req.url)
+    next()
+})
+
+app.use((req,res,next)=>{
+    console.log('假设在处理cookie')
+    //假设在处理cookie
+    req.cookie = {
+        userId:'123wwy'
+    }
+    next()
+})
+
+app.use((req,res,next)=>{
+    //假设处理postdata
+    console.log('假设处理postdata')
+    setTimeout(()=>{
+        req.body={
+            a:100,
+            b:200
+        }
+        next()
+    }
+    )
+})
+
+app.use('/api',(req,res,next)=>{
+    console.log('处理api路由 ')
+    next() 
+})
+
+
+app.get('/api',(req,res,next)=>{
+    console.log('get处理api路由 ')
+    next() 
+})
+
+app.post('/api',(req,res,next)=>{
+    console.log('post 处理api路由 ')
+    next() 
+})
+//模拟登录验证
+function loginCheck(req,res,next){
+    console.log('模拟登录成功')
+    setTimeout(()=>{
+        next()
+    })
+}
+
+app.get('/api/get-cookie',loginCheck,(req,res,next)=>{
+    console.log('get /api/get-cookie')
+    res.json({
+        error:0,
+        data:req.cookie
+    })
+})
+
+app.post('/api/get-post-data',(req,res,next)=>{
+    console.log('post api/get-post-data')
+    res.json({
+        error:0,
+        data:req.body
+    })
+})
+
+app.use((req,res,next)=>{
+    console.log('处理404')
+    res.json({
+        error:-1,
+        msg:'404 not found '
+    })
+})
+
+app.listen(3000,()=>{
+    console.log('server is start for 3000')
+})
 ```

@@ -602,6 +602,16 @@ import _, { test, name } from './a.js';
 test(`my name is ${name}`);
 ```
 
+## xss攻击
+```js
+//xss攻击就是在页面展示内容中参杂js代码，以获取网页信息
+//预防措施 转换生成js的特殊字符
+//安装
+npm install xss --save
+const xss = require('xss')
+xss('里面就是页面传进来的信息（变量）')
+```
+
 <ClientOnly>
 <buttom-view></buttom-view>
 </ClientOnly>
