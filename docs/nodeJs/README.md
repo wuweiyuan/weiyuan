@@ -209,6 +209,8 @@ get myname
 keys *
 //删除自己设置的key
 del myname
+//终止服务
+redis-cli shutdown
 ```
 
 ## nodejs连接redis
