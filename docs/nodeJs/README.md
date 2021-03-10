@@ -432,3 +432,47 @@ app.listen(3000,()=>{
     console.log('server is start for 3000')
 })
 ```
+
+
+## 修改环境变量
+```js
+"dev": "cross-env NODE_ENV=dev nodemon ./bin/www.js",
+"prd": "cross-env NODE_ENV=production nodemon ./bin/www.js"
+
+//dev和production可自行修改
+//在代码中process.env.NODE_ENV可以获取到
+```
+
+## pm2
+```js
+//安装
+sudo npm install pm2 -g
+//package.json
+"prd":"cross-env NODE_ENV=production pm2 start index.js"
+//常用命令
+pm2 start ... //开启
+pm2 list //pm2列表
+pm2 restart <AppName>/<id> //手动重启
+pm2 stop <AppName>/<id>//停止
+pm2 delete <AppName>/<id>//删除
+pm2 info <AppName>/<id>//基本信息
+pm2 log <AppName>/<id>//日志
+pm2 monit <AppName>/<id>//监控cpu内存信息
+//pm2一遇到错误就能重启，保证不错误的地方成功运行
+//配置
+//新建pm2配置文件pm2.conf.json
+{
+    "apps":{
+        "name":"woshiwuweiyuan",//更改名字
+        "script":"index.js",
+        "watch":true,//监听文件变化
+        "ignore_watch":["node_modules","logs"],//哪些文件不需要监听
+        "error_file":"logs/err.log",//错误日志存放位置
+        "out_file":"logs/out.log",//正常日志存放地方
+        "log_date_format":"YYYY-MM-DD HH:mm:ss", //日志时间错格式
+        "instances":4//四进程，看你电脑几核
+    }
+}
+//然后启动命令可以改为
+"prd":"cross-env NODE_ENV=production pm2 start pm2.conf.json"
+```

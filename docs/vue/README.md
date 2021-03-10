@@ -141,7 +141,19 @@ const refData = toRefs(data);
 
 ## vue3 和 vue2 生命周期的变化
 
-<img src='/image/vue3life.png'/>
+```js
+beforeCreate 
+created 
+beforeMount -> onBeforeMount
+mounted -> onMounted
+beforeUpdate -> onBeforeUpdate
+updated -> onUpdated
+beforeUnmount -> onBeforeUnmount
+unmounted -> onUnmounted
+errorCaptured -> onErrorCaptured
+renderTracked -> onRenderTracked
+renderTriggered -> onRenderTriggered
+```
 
 ## vue3 onRenderTriggered 可以监视数据的变化(类似一个生命周期)
 
@@ -291,4 +303,28 @@ axios.get('/sd?id=1').then(res=>{
 axios.defaults.headers.common.Authorization = `Bearer ${token}`
 //浏览器存token
 localStorage.setItem('token',token)
+```
+## Reactiv
+```js
+import { ref, computed, reactive, toRefs } from 'vue'
+
+interface DataProps {
+  count: number;
+  double: number;
+  increase: () => void;
+}
+
+setup() {
+  const data: DataProps  = reactive({
+    count: 0,
+    increase: () => { data.count++},
+    double: computed(() => data.count * 2)
+  })
+  const refData = toRefs(data)
+  return {
+    ...refData
+  }
+}
+//toRefs 保证 reactive 对象属性保持响应性。
+
 ```
