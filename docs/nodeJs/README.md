@@ -478,3 +478,12 @@ pm2 monit <AppName>/<id>//监控cpu内存信息
 //然后启动命令可以改为
 "prd":"cross-env NODE_ENV=production pm2 start pm2.conf.json"
 ```
+
+## npm 安装中的 i、-g、--save、--save-dev、-D、-S的区别
+```sh
+ -g 是全局安装，不带 -g 会安装在个人文件夹
+ -S 与 --save 的简写，安装包信息会写入 dependencies 中
+ -D 与 --save-dev 的简写，安装包写入 devDependencies 中
+ dependencies 生产阶段的依赖,也就是项目运行时的依赖
+ devDependencies 开发阶段的依赖，就是我们在开发过程中需要的依赖，只在开发阶段起作用的
+```

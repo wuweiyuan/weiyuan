@@ -328,3 +328,116 @@ setup() {
 //toRefs 保证 reactive 对象属性保持响应性。
 
 ```
+
+## 关于setup
+```sh
+1.由于在执行setup函数的时候，还没有执行 created 生命周期方法，所以在 setup 函数中，是无法使用 data 和 methods
+2.由于不能再 setup 函数中使用 data 和 methods，所以 Vue 为了避免我们的错误使用，它直接将 setup 函数中的 this 修改成了 undefined
+3.setup 函数只能是同步的，不能是异步的，async setup() {} 错误使用
+```
+
+## 关于ref
+```js
+let state = ref({
+  a:'a',
+  gf:{
+    b:'b',
+    c:{
+      c:'c'
+    }
+  }
+})
+//要获取c或者其他字段，只需一个value
+state.value.gf.c.c
+```
+
+## VUE3.0是如何变快的
+```sh
+1.diff方法优化：http://vue-next-template-explorer.netlify.app/
+
+  1)Vue2 中的虚拟dom是进行全量的对比
+  2)Vue3 新增了静态标记(PatchFlag)
+　　　　在与上次虚拟节点进行对比时候，只对比带有 patch flag 的节点
+
+　　　　并且可以通过 flag 的信息得知当前节点要对比的具体内容
+
+　　　　在创建虚拟dom的时候，会根据DOM中的内容会不会发生变化，添加静态标记
+
+2.hoistStatic 静态提升
+
+  1)Vue2中无论元素是否参与更新，每次都会重新创建，然后再渲染
+  2)Vue3中对不参与更新的元素，会做静态提升，只会被创建一次，在渲染时直接复用即可
+　　
+
+3.cacheHandlers 事件侦听缓存
+
+  1)默认情况下 onClick 会被视为动态绑定，所以每次都会去追踪它的变化
+  2)但是因为是同一个函数，所以没有追踪变化，直接缓存起来复用即可  
+  3)在Vue3中的diff算法中，只有存在静态标记的节点才会进行追踪，事件侦听缓存本质上是去除了不必要的diff比较
+　　
+
+4.SSR渲染
+
+  1)当有大量静态的内容时候，这些内容会被当做纯字符串推进一个Buffer里面，即使存在动态的绑定，会通过模板插值嵌入进去。这样会比通过虚拟dom来渲染快上很多。
+  2)当静态内容达到一定量级时候，会使用_createStaticVNode方法在客户端dom来渲染一个static node，这些静态node，会被直接innerHtml，就不需要创建对象，然后根据对象渲染。
+```
+
+## vite
+```js
+//Vite是Vue作者开发的一款意图取代webpack的工具
+//其实现原理是利用ES6的import会发送请求去加载文件的特性，拦截这些请求，做一些预编译，省去webpack冗长的打包时间
+// 1. 安装Vite
+npm install -g create-vite-app
+// 2. 创建Vue3项目
+create-vite-app projectName
+// 3. 安装依赖运行项目
+cd projectName
+npm install
+npm run dev
+```
+
+## reactive：响应式数据（json/arr）
+```js
+<template>
+  <div>
+    <p>{{time}}</p>
+    <button @click="myFn">按钮</button>
+  </div>
+</template>
+
+<script>
+/*
+    reactive的用法与ref的用法相似，也是将数据变成响应式数据，当数据发生变化时UI也会自动更新。
+    不同的是ref用于基本数据类型，而reactive是用于复杂数据类型，比如对象和数组
+*/
+// toRefs解构
+import { reactive,toRefs } from 'vue'
+export default {
+  name: 'App',
+  setup() {
+    //   赋值
+    let state = reactive({
+      time: new Date(),
+    })
+
+    function myFn() {
+    /*
+        reactive中传递的参数必须是json对象或者数组，如果传递了其他对象（比如new Date()），在默认情况下修改对象，
+        界面不会自动更新，如果也需要具有响应式，可以通过重新赋值的方式实现
+    */
+      const newTime = new Date(state.time.getTime())
+      newTime.setDate(newTime.getDate() + 1)
+      state.time = newTime
+      // state.time.setDate(state.time.getDate() + 1) ,页面不更新
+      　　console.log(state)    // reactive将传递的对象包装成了proxy对象
+    }
+
+    return {
+      ...toRefs(state),
+      myFn,
+    }
+  }
+}
+</script>
+```
+
