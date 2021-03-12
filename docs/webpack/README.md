@@ -267,7 +267,9 @@ module.exports = {
   mode: 'development', // 开发模式
   // 开发服务器 devServer：用来自动化，不用每次修改后都重新输入webpack打包一遍（自动编译，自动打开浏览器，自动刷新浏览器）
   // 特点：只会在内存中编译打包，不会有任何输出（不会像之前那样在外面看到打包输出的build包，而是在内存中，关闭后会自动删除）
+  //要下载webpack-dev-server这个包
   // 启动devServer指令为：npx webpack-dev-server
+  //本机启动devServer指令为：npx webpack serve
   devServer: {
     // 项目构建后路径
     contentBase: resolve(__dirname, 'build'),
@@ -279,4 +281,8 @@ module.exports = {
     open: true,
   },
 }
+```
+```sh
+webpack 会将打包结果输出出去（build文件夹）
+npx webpack serve 只会在内存中编译打包，没有输出
 ```
