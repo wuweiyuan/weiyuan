@@ -285,4 +285,5 @@ module.exports = {
 ```sh
 webpack 会将打包结果输出出去（build文件夹）
 npx webpack serve 只会在内存中编译打包，没有输出
+css文件不能分类，因为解析在js中
 ```
