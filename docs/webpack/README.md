@@ -237,6 +237,9 @@ module.exports = {
         test: /\.html$/,
         // 处理html文件的img图片（负责引入img，从而能被url-loader进行处理）
         loader: 'html-loader',
+        options:{
+                    esModule:false
+                }
       },
       // 打包其他资源(除了html/js/css资源以外的资源)
       {
