@@ -177,7 +177,7 @@ webpack 本身能处理 js/json 资源，不能处理 css/img 等其他资源
 生产环境比开发环境多一个压缩 js 代码
 ```
 
-## webpack.config.js配置相关解释
+## webpack.config.js配置相关解释(开发环境)
 ```js
 // resolve用来拼接绝对路径的方法
 const { resolve } = require('path')
@@ -286,5 +286,304 @@ module.exports = {
 webpack 会将打包结果输出出去（build文件夹）
 npx webpack serve 只会在内存中编译打包，没有输出
 css文件不能分类，因为解析在js中 //outputPath:'imgs'
+loader 和 plugin 的不同：（plugin 一定要先引入才能使用）
+​loader：1. 下载 2. 使用（配置 loader）
+​plugins：1.下载 2. 引入 3. 使用
+```
+## webpack.config.js配置相关解释(生产环境)
+```sh
+而生产环境的配置需要考虑以下几个方面：
 
+1.提取 css 成单独文件
+2.css 兼容性处理
+3.压缩 css
+4.js 语法检查
+5.js 兼容性处理
+6.js 压缩
+7.html 压缩
+```
+```js
+//下面是一个基本的生产环境下的webpack.config.js配置
+const { resolve } = require('path')
+const MiniCssExtractorPlugin = require('mini-css-extract-plugin')
+const OptimiziCssAssetsWebpackPlugin = require('optimizi-css-assets-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+
+// 定义node.js的环境变量，决定使用browserslist的哪个环境
+process.env.NODE_ENV = 'production'
+
+// 复用loader的写法
+const commonCssLoader = [
+  // 这个loader取代style-loader。作用：提取js中的css成单独文件然后通过link加载
+  MiniCssExtractPlugin.loader,
+  // css-loader：将css文件整合到js文件中
+  // 经过css-loader处理后，样式文件是在js文件中的
+  // 问题：1.js文件体积会很大2.需要先加载js再动态创建style标签，样式渲染速度就慢，会出现闪屏现象
+  // 解决：用MiniCssExtractPlugin.loader替代style-loader
+  'css-loader',
+  /*
+    postcss-loader：css兼容性处理：postcss --> 需要安装：postcss-loader postcss-preset-env
+    postcss需要通过package.json中browserslist里面的配置加载指定的css兼容性样式
+    在package.json中定义browserslist：
+    "browserslist": {
+      // 开发环境 --> 设置node环境变量：process.env.NODE_ENV = development
+      "development": [ // 只需要可以运行即可
+        "last 1 chrome version",
+        "last 1 firefox version",
+        "last 1 safari version"
+      ],
+      // 生产环境。默认是生产环境
+      "production": [ // 需要满足绝大多数浏览器的兼容
+        ">0.2%",
+        "not dead",
+        "not op_mini all"
+      ]
+    },
+  */
+  {
+    loader: 'postcss-loader',
+    options: {
+      postcssOptions:{
+        ident: 'postcss', // 基本写法
+        //这样打包就有兼容性代码了
+        plugins:[
+            require('postcss-preset-env')
+        ],
+        //这样写就没有兼容性代码
+          // plugins: () => [
+          //     // postcss的插件
+          //     require('postcss-preset-env')()
+          //   ]
+      }
+      
+      plugins: () => [
+        // postcss的插件
+        require('postcss-preset-env')(),
+      ],
+    },
+  },
+]
+
+module.exports = {
+  entry: './src/js/index.js',
+  output: {
+    filename: 'js/built.js',
+    path: resolve(__dirname, 'build'),
+  },
+  module: {
+    rules: [
+      {
+        test: /\.css$/,
+        use: [...commonCssLoader],
+      },
+      {
+        test: /\.less$/,
+        use: [...commonCssLoader, 'less-loader'],
+      },
+      /*
+        正常来讲，一个文件只能被一个loader处理
+        当一个文件要被多个loader处理，那么一定要指定loader执行的先后顺序
+        先执行eslint再执行babel（用enforce）
+      */
+      {
+        /*
+          js的语法检查： 需要下载 eslint-loader eslint
+          注意：只检查自己写的源代码，第三方的库是不用检查的
+          airbnb(一个流行的js风格) --> 需要下载 eslint-config-airbnb-base eslint-plugin-import
+          设置检查规则：
+            package.json中eslintConfig中设置
+              "eslintConfig": {
+                "extends": "airbnb-base"， // 继承airbnb的风格规范
+                "env": {
+                  "browser": true // 可以使用浏览器中的全局变量(使用window不会报错)
+                }
+              }
+        */
+        test: /\.js$/,
+        exclude: /node_modules/, // 忽略node_modules
+        enforce: 'pre', // 优先执行
+        loader: 'eslint-loader',
+        options: {
+          // 自动修复
+          fix: true,
+        },
+      },
+      /*
+        js兼容性处理：需要下载 babel-loader @babel/core
+          1. 基本js兼容性处理 --> @babel/preset-env
+            问题：只能转换基本语法，如promise高级语法不能转换
+          2. 全部js兼容性处理 --> @babel/polyfill
+            问题：只要解决部分兼容性问题，但是将所有兼容性代码全部引入，体积太大了
+          3. 需要做兼容性处理的就做：按需加载  --> core-js
+      */
+      {
+        // 第三种方式：按需加载
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader',
+        options: {
+          // 预设：指示babel做怎样的兼容性处理
+          presets: [
+            '@babel/preset-env', // 基本预设
+            {
+              useBuiltIns: 'usage', //按需加载
+              corejs: { version: 3 }, // 指定core-js版本
+              targets: { // 指定兼容到什么版本的浏览器
+                chrome: '60',
+                firefox: '50',
+                ie: '9',
+                safari: '10',
+                edge: '17'
+              },
+            },
+          ],
+        },
+      },
+      {
+        // 图片处理
+        test: /\.(jpg|png|gif)/,
+        loader: 'url-loader',
+        options: {
+          limit: 8 * 1024,
+          name: '[hash:10].[ext]',
+          outputPath: 'imgs',
+          esModule: false, // 关闭url-loader默认使用的es6模块化解析
+        },
+      },
+      // html中的图片处理
+      {
+        test: /\.html$/,
+        loader: 'html-loader',
+      },
+      // 处理其他文件
+      {
+        exclude: /\.(js|css|less|html|jpg|png|gif)/,
+        loader: 'file-loader',
+        options: {
+          outputPath: 'media',
+        },
+      },
+    ],
+  },
+  plugins: [
+    new MiniCssExtractPlugin({
+      // 对输出的css文件进行重命名
+      filename: 'css/built.css',
+    }),
+    // 压缩css
+    new OptimiziCssAssetsWebpackPlugin(),
+    // HtmlWebpackPlugin：html文件的打包和压缩处理
+    // 通过这个插件会自动将单独打包的样式文件通过link标签引入
+    new HtmlWebpackPlugin({
+      template: './src/index.html',
+      // 压缩html代码
+      minify: {
+        // 移除空格
+        collapseWhitespace: true,
+        // 移除注释
+        removeComments: true,
+      },
+    }),
+  ],
+  // 生产环境下会自动压缩js代码
+  mode: 'production',
+}
+```
+
+## 开发环境性能优化
+```sh
+1.HMR（模块热替换）
+  HMR: hot module replacement 热模块替换 / 模块热替换
+
+  作用：一个模块发生变化，只会重新打包构建这一个模块（而不是打包所有模块） ，极大提升构建速度
+
+  代码：只需要在 devServer 中设置 hot 为 true，就会自动开启HMR功能（只能在开发模式下使用）但是我的电脑不生效，还需加多一项配置    
+    target:"web"
+
+    devServer: {
+      contentBase: resolve(__dirname, 'build'),
+      compress: true,
+      port: 3000,
+      open: true,
+      // 开启HMR功能
+      // 当修改了webpack配置，新配置要想生效，必须重启webpack服务
+      hot: true
+    }
+  每种文件实现热模块替换的情况：
+
+    样式文件：可以使用HMR功能，因为开发环境下使用的 style-loader 内部默认实现了热模块替换功能
+
+    js 文件：默认不能使用HMR功能（修改一个 js 模块所有 js 模块都会刷新）
+
+      --> 实现 HMR 需要修改 js 代码（添加支持 HMR 功能的代码）
+      // 绑定
+      if (module.hot) {
+        // 一旦 module.hot 为true，说明开启了HMR功能。 --> 让HMR功能代码生效
+        module.hot.accept('./print.js', function() {
+          // 方法会监听 print.js 文件的变化，一旦发生变化，只有这个模块会重新打包构建，其他模块不会。
+          // 会执行后面的回调函数
+          print();
+        });
+      }
+      注意：HMR 功能对 js 的处理，只能处理非入口 js 文件的其他文件。
+    html 文件: 默认不能使用 HMR 功能（html 不用做 HMR 功能，因为只有一个 html 文件，不需要再优化）
+
+      使用 HMR 会导致问题：html 文件不能热更新了（不会自动打包构建）
+
+      解决：修改 entry 入口，将 html 文件引入（这样 html 修改整体刷新）
+
+      entry: ['./src/js/index.js', './src/index.html']
+
+2.source-map
+  source-map：一种提供源代码到构建后代码的映射的技术 （如果构建后代码出错了，通过映射可以追踪源代码错误）
+
+  参数：[inline-|hidden-|eval-][nosources-][cheap-[module-]]source-map
+
+  代码：
+
+    devtool: 'eval-source-map'
+  可选方案：[生成source-map的位置|给出的错误代码信息]
+
+    source-map：外部，错误代码准确信息 和 源代码的错误位置
+
+    inline-source-map：内联，只生成一个内联 source-map，错误代码准确信息 和 源代码的错误位置
+
+    hidden-source-map：外部，错误代码错误原因，但是没有错误位置（为了隐藏源代码），不能追踪源代码错误，只能提示到构建后代码的错误位置
+
+    eval-source-map：内联，每一个文件都生成对应的 source-map，都在 eval 中，错误代码准确信息 和 源代码的错误位
+
+    nosources-source-map：外部，错误代码准确信息，但是没有任何源代码信息（为了隐藏源代码）
+
+    cheap-source-map：外部，错误代码准确信息 和 源代码的错误位置，只能把错误精确到整行，忽略列
+
+    cheap-module-source-map：外部，错误代码准确信息 和 源代码的错误位置，module 会加入 loader 的 source-map
+  内联 和 外部的区别：1. 外部生成了文件，内联没有 2. 内联构建速度更快
+
+  开发/生产环境可做的选择：
+
+  开发环境：需要考虑速度快，调试更友好
+
+    速度快( eval > inline > cheap >... )
+
+      eval-cheap-souce-map
+
+      eval-source-map
+
+    调试更友好
+
+      souce-map
+
+      cheap-module-souce-map
+
+      cheap-souce-map
+    最终得出最好的两种方案 --> eval-source-map（完整度高，内联速度快） / eval-cheap-module-souce-map（错误提示忽略列但是包含其他信息，内联速度快）
+  生产环境：需要考虑源代码要不要隐藏，调试要不要更友好
+
+    内联会让代码体积变大，所以在生产环境不用内联
+
+    隐藏源代码
+
+      nosources-source-map 全部隐藏
+      hidden-source-map 只隐藏源代码，会提示构建后代码错误信息
+    最终得出最好的两种方案 --> source-map（最完整） / cheap-module-souce-map（错误提示一整行忽略列）
 ```
