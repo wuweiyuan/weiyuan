@@ -715,3 +715,53 @@ module.exports = {
         })
        ]
 ```
+
+## 优化代码运行的性能
+```sh
+1.缓存
+2.tree shaking（树摇）
+  tree shaking：去除无用代码
+  前提：1. 必须使用 ES6 模块化 2. 开启 production 环境 （这样就自动会把无用代码去掉）
+  作用：减少代码体积
+  在package.json中配置：
+  "sideEffects": false 表示所有代码都没有副作用（都可以进行 tree shaking）
+  这样会导致的问题：可能会把 css / @babel/polyfill 文件干掉（副作用）
+  所以可以配置："sideEffects": ["*.css", "*.less"] 不会对css/less文件tree shaking处理
+3.code split（代码分割）
+  代码分割。将打包输出的一个大的 bundle.js 文件拆分成多个小文件，这样可以并行加载多个文件，比加载一个文件更快。
+  (1)多入口拆分
+    entry: {
+      // 多入口：有一个入口，最终输出就有一个bundle
+      index: './src/js/index.js',
+      test: './src/js/test.js'
+    },
+    output: {
+      // [name]：取文件名
+      filename: 'js/[name].[contenthash:10].js',
+      path: resolve(__dirname, 'build')
+    },
+  (2)optimization
+    optimization: {
+      splitChunks: {
+        chunks: 'all'
+      }
+    },
+     将 node_modules 中的代码单独打包（大小超过30kb）
+     自动分析多入口chunk中，有没有公共的文件。如果有会打包成单独一个chunk(比如两个模块中都引入了jquery会被打包成单独的文件)（大小超过30kb）
+  (3)import 动态导入语法
+    /*
+      通过js代码，让某个文件被单独打包成一个chunk
+      import动态导入语法：能将某个文件单独打包(test文件不会和index打包在同一个文件而是单独打包)
+      webpackChunkName:指定test单独打包后文件的名字
+    */
+    import(/* webpackChunkName: 'test' */'./test')
+      .then(({ mul, count }) => {
+        // 文件加载成功~
+        // eslint-disable-next-line
+        console.log(mul(2, 5));
+      })
+      .catch(() => {
+        // eslint-disable-next-line
+        console.log('文件加载失败~');
+      });
+```
