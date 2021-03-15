@@ -714,6 +714,115 @@ module.exports = {
           filename: 'css/built.[contenthash:10].css'
         })
        ]
+
+3.多进程打包
+  多进程打包：某个任务消耗时间较长会卡顿，多进程可以同一时间干多件事，效率更高。
+  优点是提升打包速度，缺点是每个进程的开启和交流都会有开销（babel-loader消耗时间最久，所以使用thread-loader针对其进行优化）
+
+  {
+    test: /\.js$/,
+    exclude: /node_modules/,
+    use: [
+      /* 
+        thread-loader会对其后面的loader（这里是babel-loader）开启多进程打包。 
+        进程启动大概为600ms，进程通信也有开销。(启动的开销比较昂贵，不要滥用)
+        只有工作消耗时间比较长，才需要多进程打包
+      */
+      {
+        loader: 'thread-loader',
+        options: {
+          workers: 2 // 进程2个
+        }
+      },
+      {
+        loader: 'babel-loader',
+        options: {
+          presets: [
+            [
+              '@babel/preset-env',
+              {
+                useBuiltIns: 'usage',
+                corejs: { version: 3 },
+                targets: {
+                  chrome: '60',
+                  firefox: '50'
+                }
+              }
+            ]
+          ],
+          // 开启babel缓存
+          // 第二次构建时，会读取之前的缓存
+          cacheDirectory: true
+        }
+      }
+    ]
+  },
+4.externals
+  externals：让某些库不打包，通过 cdn 引入
+  webpack.config.js 中配置：
+    externals: {
+      // 拒绝jQuery被打包进来(通过cdn引入，速度会快一些)
+      // 忽略的库名 -- npm包名
+      jquery: 'jQuery'
+    }
+  需要在 index.html 中通过 cdn 引入：
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+
+5.dll
+  dll：让某些库单独打包，后直接引入到 build 中。可以在 code split 分割出 node_modules 后再用 dll 更细的分割，优化代码运行的性能。
+
+  webpack.dll.js 配置：(将 jquery 单独打包)
+    /*
+      node_modules的库会打包到一起，但是很多库的时候打包输出的js文件就太大了
+      使用dll技术，对某些库（第三方库：jquery、react、vue...）进行单独打包
+      当运行webpack时，默认查找webpack.config.js配置文件
+      需求：需要运行webpack.dll.js文件
+        --> webpack --config webpack.dll.js（运行这个指令表示以这个配置文件打包）
+    */
+    const { resolve } = require('path');
+    const webpack = require('webpack');
+
+    module.exports = {
+      entry: {
+        // 最终打包生成的[name] --> jquery
+        // ['jquery] --> 要打包的库是jquery
+        jquery: ['jquery']
+      },
+      output: {
+        // 输出出口指定
+        filename: '[name].js', // name就是jquery
+        path: resolve(__dirname, 'dll'), // 打包到dll目录下
+        library: '[name]_[hash]', // 打包的库里面向外暴露出去的内容叫什么名字
+      },
+      plugins: [
+        // 打包生成一个manifest.json --> 提供jquery的映射关系（告诉webpack：jquery之后不需要再打包和暴露内容的名称）
+        new webpack.DllPlugin({
+          name: '[name]_[hash]', // 映射库的暴露的内容名称
+          path: resolve(__dirname, 'dll/manifest.json') // 输出文件路径
+        })
+      ],
+      mode: 'production'
+    };
+
+  webpack.config.js 配置：(告诉 webpack 不需要再打包 jquery，并将之前打包好的 jquery 跟其他打包好的资源一同输出到 build 目录下)
+    // 引入插件
+    const webpack = require('webpack');
+    const AddAssetHtmlWebpackPlugin = require('add-asset-html-webpack-plugin');
+
+    // plugins中配置：
+    plugins: [
+      new HtmlWebpackPlugin({
+        template: './src/index.html'
+      }),
+      // 告诉webpack哪些库不参与打包，同时使用时的名称也得变
+      new webpack.DllReferencePlugin({
+        manifest: resolve(__dirname, 'dll/manifest.json')
+      }),
+      // 将某个文件打包输出到build目录下，并在html中自动引入该资源
+      new AddAssetHtmlWebpackPlugin({
+        filepath: resolve(__dirname, 'dll/jquery.js')
+      })
+    ],
 ```
 
 ## 优化代码运行的性能
@@ -764,4 +873,61 @@ module.exports = {
         // eslint-disable-next-line
         console.log('文件加载失败~');
       });
+4.lazy loading（懒加载/预加载）
+  (1)懒加载：当文件需要使用时才加载（需要代码分割）。但是如果资源较大，加载时间就会较长，有延迟。
+  (2)正常加载：可以认为是并行加载（同一时间加载多个文件）没有先后顺序，先加载了不需要的资源就会浪费时间。
+  (3)预加载 prefetch（兼容性很差）：会在使用之前，提前加载。等其他资源加载完毕，浏览器空闲了，再偷偷加载这个资源。这样在使用时已经加载好了，速度很快。所以在懒加载的基础上加上预加载会更好。
+  代码：
+  document.getElementById('btn').onclick = function() {
+    // 将import的内容放在异步回调函数中使用，点击按钮，test.js才会被加载(不会重复加载)
+    // webpackPrefetch: true表示开启预加载
+    import(/* webpackChunkName: 'test', webpackPrefetch: true */'./test').then(({ mul }) => {
+      console.log(mul(4, 5));
+    });
+    import('./test').then(({ mul }) => {
+      console.log(mul(2, 5))
+    })
+  };
+5.pwa（离线可访问技术）
+  pwa：离线可访问技术（渐进式网络开发应用程序），使用 serviceworker 和 workbox 技术。优点是离线也能访问，缺点是兼容性差。
+  webpack.config.js 中配置：
+    const WorkboxWebpackPlugin = require('workbox-webpack-plugin'); // 引入插件
+
+    // plugins中加入：
+    new WorkboxWebpackPlugin.GenerateSW({
+      /*
+        1. 帮助serviceworker快速启动
+        2. 删除旧的 serviceworker
+
+        生成一个 serviceworker 配置文件
+      */
+      clientsClaim: true,
+      skipWaiting: true
+    })
+  index.js 中还需要写一段代码来激活它的使用：
+    /*
+      1. eslint不认识 window、navigator全局变量
+        解决：需要修改package.json中eslintConfig配置
+        "env": {
+          "browser": true // 支持浏览器端全局变量
+        }
+      2. sw代码必须运行在服务器上
+        --> nodejs
+        或-->
+          npm i serve -g
+          serve -s build 启动服务器，将打包输出的build目录下所有资源作为静态资源暴露出去
+          我自己用的是http-server
+    */
+    if ('serviceWorker' in navigator) { // 处理兼容性问题
+      window.addEventListener('load', () => {
+        navigator.serviceWorker
+          .register('/service-worker.js') // 注册serviceWorker
+          .then(() => {
+            console.log('sw注册成功了~');
+          })
+          .catch(() => {
+            console.log('sw注册失败了~');
+          });
+      });
+    }  
 ```
