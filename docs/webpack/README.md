@@ -355,11 +355,6 @@ const commonCssLoader = [
           //     require('postcss-preset-env')()
           //   ]
       }
-      
-      plugins: () => [
-        // postcss的插件
-        require('postcss-preset-env')(),
-      ],
     },
   },
 ]
@@ -586,4 +581,137 @@ module.exports = {
       nosources-source-map 全部隐藏
       hidden-source-map 只隐藏源代码，会提示构建后代码错误信息
     最终得出最好的两种方案 --> source-map（最完整） / cheap-module-souce-map（错误提示一整行忽略列）
+```
+
+## 生产环境性能优化
+```sh
+1.oneOf
+  oneOf：匹配到 loader 后就不再向后进行匹配，优化生产环境的打包构建速度
+  代码：
+    module: {
+      rules: [
+        {
+          // js 语法检查
+          test: /\.js$/,
+          exclude: /node_modules/,
+          // 优先执行
+          enforce: 'pre',
+          loader: 'eslint-loader',
+          options: {
+            fix: true
+          }
+        },
+        {
+          // oneOf 优化生产环境的打包构建速度
+          // 以下loader只会匹配一个（匹配到了后就不会再往下匹配了）
+          // 注意：不能有两个配置处理同一种类型文件（所以把eslint-loader提取出去放外面）
+          oneOf: [
+            {
+              test: /\.css$/,
+              use: [...commonCssLoader]
+            },
+            {
+              test: /\.less$/,
+              use: [...commonCssLoader, 'less-loader']
+            },
+            {
+              // js 兼容性处理
+              test: /\.js$/,
+              exclude: /node_modules/,
+              loader: 'babel-loader',
+              options: {
+                presets: [
+                  [
+                    '@babel/preset-env',
+                    {
+                      useBuiltIns: 'usage',
+                      corejs: {version: 3},
+                      targets: {
+                        chrome: '60',
+                        firefox: '50'
+                      }
+                    }
+                  ]
+                ]
+              }
+            },
+            {
+              test: /\.(jpg|png|gif)/,
+              loader: 'url-loader',
+              options: {
+                limit: 8 * 1024,
+                name: '[hash:10].[ext]',
+                outputPath: 'imgs',
+                esModule: false
+              }
+            },
+            {
+              test: /\.html$/,
+              loader: 'html-loader'
+            },
+            {
+              exclude: /\.(js|css|less|html|jpg|png|gif)/,
+              loader: 'file-loader',
+              options: {
+                outputPath: 'media'
+              }
+            }
+          ]
+        }
+      ]
+    },
+
+
+2.缓存
+  babel 缓存：类似 HMR，将 babel 处理后的资源缓存起来（哪里的 js 改变就更新哪里，其他 js 还是用之前缓存的资源），让第二次打包构建速度更快
+
+  代码：
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader',
+        options: {
+          presets: [
+            [
+              '@babel/preset-env',
+              {
+                useBuiltIns: 'usage',
+                corejs: { version: 3 },
+                targets: {
+                  chrome: '60',
+                  firefox: '50'
+                }
+              }
+            ]
+          ],
+          // 开启babel缓存
+          // 第二次构建时，会读取之前的缓存
+          cacheDirectory: true
+        }
+      },
+
+  文件资源缓存
+    文件名不变，就不会重新请求，而是再次用之前缓存的资源
+      hash: 每次 wepack 打包时会生成一个唯一的 hash 值。
+
+​         问题：重新打包，所有文件的 hsah 值都改变，会导致所有缓存失效。（可能只改动了一个文件）
+
+      chunkhash：根据 chunk 生成的 hash 值。来源于同一个 chunk的 hash 值一样
+
+​         问题：js 和 css 来自同一个chunk，hash 值是一样的（因为 css-loader 会将 css 文件加载到 js 中，所以同属于一个chunk）
+
+      contenthash: 根据文件的内容生成 hash 值。不同文件 hash 值一定不一样(文件内容修改，文件名里的 hash 才会改变)
+
+         修改 css 文件内容，打包后的 css 文件名 hash 值就改变，而 js 文件没有改变 hash 值就不变，这样 css 和 js 缓存就会分开判断要不要重新请求资源 --> 让代码上线运行缓存更好使用
+    
+    代码：
+      output: {
+        filename: 'js/built.[contenthash:10].js',
+        path: resolve(__dirname, 'build')
+      },
+       plugins: [
+        new MiniCssExtractPlugin({
+          filename: 'css/built.[contenthash:10].css'
+        })
+       ]
 ```
