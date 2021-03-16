@@ -7,8 +7,170 @@ https://www.cnblogs.com/kerwin1727/p/11433762.html
 箭头函数和 this
 <br>
 https://www.cnblogs.com/lfri/p/11872696.html
-::: -->
 
+https://www.cnblogs.com/youhong/p/6209054.html
+::: -->
+## call
+```js
+//有句话非常重要谁调用这个函数，this就指向谁
+var a = 1
+var obj1 = {
+  a:2,
+  fn:function(){
+    console.log(this.a)
+  }
+}
+obj1.fn()//2
+//此时的this是指obj1这个对象，obj1.fn()实际上是obj1.fn.call(obj1)，事实上谁调用这个函数，this就是谁。补充一下，DOM对象绑定事件也属于方法调用模式，因此它绑定的this就是事件源DOM对象。如：
+document.addEventListener('click', function(e){
+    console.log(this);
+    setTimeout(function(){
+        console.log(this);
+    }, 200);
+}, false);
+//点击页面，依次输出：document和window对象
+//解析：点击页面监听click事件属于方法调用，this指向事件源DOM对象，即obj.fn.apply(obj)，//setTimeout内的函数属于回调函数，可以这么理解，f1.call(null,f2)，所以this指向window。
+function fn1(){
+  console.log(this)//window
+}
+fn1()
+
+function fn1(){
+    function fn2(){
+        console.log(this)//window
+    }
+    fn2()
+}
+fn1()
+
+var a = 1
+var obj1 = {
+    a:2,
+    fn:function(){
+        console.log(this.a)
+    }
+}
+var fn1 = obj1.fn
+fn1()//1
+//但是直接obj1.fn()输出就是2了
+
+//new一个函数时，背地里会创建一个连接到prototype成员的新对象，同时this会被绑定到那个新对象上
+function Person(name,age){
+// 这里的this都指向实例
+    this.name = name
+    this.age = age
+    this.sayAge = function(){
+        console.log(this.age)
+    }
+}
+var dot = new Person('Dot',2)
+dot.sayAge()//2
+//call 方法第一个参数是要绑定给this的值，后面传入的是一个参数列表。当第一个参数为null、undefined的时候，默认指向window。
+var arr = [1, 2, 3, 89, 46]
+var max = Math.max.call(null, arr[0], arr[1], arr[2], arr[3], arr[4])//89
+//可以这么理解：
+obj1.fn() 
+obj1.fn.call(obj1);
+
+fn1()
+fn1.call(null)
+
+f1(f2)
+f1.call(null,f2)
+//看一个例子
+var obj = {
+    message: 'My name is: '
+}
+
+function getName(firstName, lastName) {
+    console.log(this.message + firstName + ' ' + lastName)
+}
+
+getName.call(obj, 'Dot', 'Dolby')//My name is: Dot Dolby
+```
+
+## apply
+```js
+//apply接受两个参数，第一个参数是要绑定给this的值，第二个参数是一个参数数组。当第一个参数为null、undefined的时候，默认指向window。
+//可以这么理解：
+obj1.fn() 
+obj1.fn.apply(obj1);
+
+fn1()
+fn1.apply(null)
+
+f1(f2)
+f1.apply(null,f2)
+//事实上apply 和 call 的用法几乎相同, 唯一的差别在于：当函数需要传递多个变量时, apply 可以接受一个数组作为参数输入, call 则是接受一系列的单独变量。
+var obj = {
+    message: 'My name is: '
+}
+
+function getName(firstName, lastName) {
+    console.log(this.message + firstName + ' ' + lastName)
+}
+
+getName.apply(obj, ['Dot', 'Dolby'])// My name is: Dot Dolby
+
+//call和apply可用来借用别的对象的方法，这里以call()为例：
+var Person1  = function () {
+    this.name = 'Dot';
+}
+var Person2 = function () {
+    this.getname = function () {
+        console.log(this.name);
+    }
+    Person1.call(this);
+}
+var person = new Person2();
+person.getname();       // Dot
+
+```
+
+## bind
+```js
+//和call很相似，第一个参数是this的指向，从第二个参数开始是接收的参数列表。区别在于bind方法返回值是函数以及bind接收的参数列表的使用。
+//bind返回值是函数
+var obj = {
+    name: 'Dot'
+}
+
+function printName() {
+    console.log(this.name)
+}
+
+var dot = printName.bind(obj)
+console.log(dot) // function () { … }
+dot()  // Dot
+//bind 方法不会立即执行，而是返回一个改变了上下文 this 后的函数。而原函数 printName 中的 this 并没有被改变，依旧指向全局对象 window。
+
+```
+
+## call,apply,bind小总结
+```sh
+call、apply和bind函数存在的区别:
+bind返回对应函数, 便于稍后调用； apply, call则是立即调用。
+
+除此外, 在 ES6 的箭头函数下, call 和 apply 将失效
+```
+
+## 详解Array.prototyoe.slice(argument)
+```js
+//这个是把类数组转为数组
+//slice内部的实现原理大概是这样的
+Array.prototype.slice = function(start,end){
+     var result = new Array();
+     start = start || 0;        // 如果不传则取默认值
+     end = end || this.length;  // 如果不传则取默认值
+
+     //this指向调用的对象，当用了call后，能够改变this的指向，也就是指向传进来的对象，这是关键
+     for(var i = start; i < end; i++){
+          result.push(this[i]);
+     }
+     return result;
+}
+
+```
 ## 闭包
 
 ::: tip
