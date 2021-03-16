@@ -931,3 +931,37 @@ module.exports = {
       });
     }  
 ```
+
+## webpack配置详情
+```sh
+1.entry
+  entry:入口起点
+    (1)string --> './src/index.js'，单入口
+      打包形成一个 chunk。 输出一个 bundle 文件。此时 chunk 的名称默认是 main
+    (2)array --> ['./src/index.js', './src/add.js']，多入口
+      所有入口文件最终只会形成一个 chunk，输出出去只有一个 bundle 文件。（一般只用在 HMR 功能中让 html 热更新生效）
+    (3)object，多入口
+      有几个入口文件就形成几个 chunk，输出几个 bundle 文件，此时 chunk 的名称是 key 值
+    --> 特殊用法：
+      entry: {
+        // 最终只会形成一个chunk, 输出出去只有一个bundle文件。
+        index: ['./src/index.js', './src/count.js'], 
+        // 形成一个chunk，输出一个bundle文件。
+        add: './src/add.js'
+      }
+
+2.output
+    output: {
+      // 文件名称（指定名称+目录）
+      filename: 'js/[name].js',
+      // 输出文件目录（将来所有资源输出的公共目录）
+      path: resolve(__dirname, 'build'),
+      // 所有资源引入公共路径前缀 --> 'imgs/a.jpg' --> '/imgs/a.jpg'
+      publicPath: '/',
+      chunkFilename: 'js/[name]_chunk.js', // 指定非入口chunk的名称
+      library: '[name]', // 打包整个库后向外暴露的变量名
+      libraryTarget: 'window' // 变量名添加到哪个上 browser：window
+      // libraryTarget: 'global' // node：global
+      // libraryTarget: 'commonjs' // conmmonjs模块 exports
+    },
+```
