@@ -441,3 +441,7 @@ export default {
 </script>
 ```
 
+## mvvm
+```sh
+  简单来说，就是数据变了，视图自动变化
+```

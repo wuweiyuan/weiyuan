@@ -259,7 +259,7 @@ console.log(arr, result);
 ```js
 let arr = [1, 2, 3];
 let result = arr.some((item) => {
-  item == 2;
+  return item == 2;
 });
 console.log(arr, result);
 ```
@@ -659,16 +659,16 @@ const obj = {
 const entries = Object.entries(obj);
 console.log(entries);
 //es10
-const formEntries = Object.formEntries(entries);
-console.log("值跟obj一样", formEntries);
+const fromEntries = Object.fromEntries(entries);
+console.log("值跟obj一样", fromEntries);
 
 //map对象转化为对象也可以用formEntries
 const map = new Map();
 map.set("name", "weiyuan");
 map.set("age", 12);
 console.log(map);
-const formEntries = Object.formEntries(map);
-console.log(formEntries);
+const fromEntries = Object.fromEntries(map);
+console.log(fromEntries);
 ```
 
 ## String.prototype.trimStart() ，String.prototype.trimEnd()
