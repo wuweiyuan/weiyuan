@@ -774,6 +774,51 @@ const xss = require('xss')
 xss('里面就是页面传进来的信息（变量）')
 ```
 
+
+## instanceof 和typeof 的区别
+```sh
+* typeof:
+    * 可以区别: 数值, 字符串, 布尔值, undefined, function
+    * 不能区别: null与对象, 一般对象与数组
+  * instanceof (obj instanceof Object )
+    * 专门用来判断对象数据的类型: Object, Array与Function
+  * ===
+    * 可以判断: undefined和null
+```
+
+## 关于引用变量问题（很重要）
+```js
+
+//关于引用变量赋值问题
+  //* 2个引用变量指向同一个对象, 通过一个引用变量修改对象内部数据, 另一个引用变量也看得见
+  //* 2个引用变量指向同一个对象,让一个引用变量指向另一个对象, 另一个引用变量还是指向原来的对象
+
+
+
+  //1. 2个引用变量指向同一个对象, 通过一个引用变量修改对象内部数据, 另一个引用变量也看得见
+  var obj1 = {}
+  var obj2 = obj1
+  obj2.name = 'Tom'
+  console.log(obj1.name)
+  function f1(obj) {
+    obj.age = 12
+  }
+  f1(obj2)
+  console.log(obj1.age)
+
+  //2. 2个引用变量指向同一个对象,让一个引用变量指向另一个对象, 另一个引用变量还是指向原来的对象
+  var obj3 = {name: 'Tom'}
+  var obj4 = obj3
+  obj3 = {name: 'JACK'}
+  console.log(obj4.name)
+  function f2(obj) {
+    obj = {name: 'Bob'}
+  }
+  f2(obj4)
+  console.log(obj4.name)
+
+
+```
 <ClientOnly>
 <buttom-view></buttom-view>
 </ClientOnly>
