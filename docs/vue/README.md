@@ -445,3 +445,13 @@ export default {
 ```sh
   简单来说，就是数据变了，视图自动变化
 ```
+
+## 抽象语法树和虚拟节点的区别
+<img src='/image/chouxiangyufashuhexunijiedian.png'/>
+```sh
+抽象语法树的终点是h函数（渲染函数），
+h函数的执行会变成虚拟节点，
+虚拟节点经过diff或者patch就会在界面上进行显示
+抽象语法树是不会进行diff的
+
+```

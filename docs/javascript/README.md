@@ -819,6 +819,296 @@ xss('里面就是页面传进来的信息（变量）')
 
 
 ```
+
+## IIFE
+```js
+//就是匿名函数，马上执行，要用（）包起来
+(function (i) {
+    var a = 4
+    function fn() {
+      console.log('fn ', i+a)
+    }
+    fn()
+  })(3)
+```
+
+## 原型
+```js
+
+//1. 函数的prototype属性(图)
+//  * 每个函数都有一个prototype属性, 它默认指向一个Object空对象(即称为: 原型对象)
+//  * 原型对象中有一个属性constructor, 它指向函数对象
+//2. 给原型对象添加属性(一般都是方法)
+//  * 作用: 函数的所有实例对象自动拥有原型中的属性(方法)
+
+  // 每个函数都有一个prototype属性, 它默认指向一个对象(即称为: 原型对象)
+  console.log(Date.prototype, typeof Date.prototype)
+  function fn() {
+
+  }
+  console.log(fn.prototype, typeof fn.prototype)
+
+  // 原型对象中有一个属性constructor, 它指向函数对象
+  console.log(Date.prototype.constructor===Date)
+  console.log(fn.prototype.constructor===fn)
+
+
+  // 2. 给原型对象添加属性(一般都是方法)
+  function F() {
+
+  }
+  F.prototype.age = 12 //添加属性
+  F.prototype.setAge = function (age) { // 添加方法
+    this.age = age
+  }
+  // 创建函数的实例对象
+  var f = new F()
+  console.log(f.age)
+  f.setAge(23)
+  console.log(f.age)
+
+```
+
+## 显示原型和隐式原型
+```js
+
+//1. 每个函数function都有一个prototype，即显式原型
+//2. 每个实例对象都有一个__proto__，可称为隐式原型
+//3. 对象的隐式原型的值为其对应构造函数的显式原型的值
+//4. 总结:
+  //* 函数的prototype属性: 在定义函数时自动添加的, 默认值是一个空Object对象
+  //* 对象的__proto__属性: 创建对象时自动添加的, 默认值为构造函数的prototype属性值
+  //* 程序员能直接操作显式原型, 但不能直接操作隐式原型(ES6之前)
+  function Fn() {
+
+  }
+  var fn = new Fn()
+  console.log(Fn.prototype, fn.__proto__)
+  console.log(Fn.prototype===fn.__proto__)
+
+  Fn.prototype.test = function () {
+    console.log('test()')
+  }
+  fn.test()
+
+```
+
+## 原型链
+```js
+//1. 原型链(图解)
+//  * 访问一个对象的属性时，
+//    * 先在自身属性中查找，找到返回
+//    * 如果没有, 再沿着__proto__这条链向上查找, 找到返回
+//    * 如果最终没找到, 返回undefined
+//  * 别名: 隐式原型链
+//  * 作用: 查找对象的属性(方法)
+//2. 构造函数/原型/实体对象的关系(图解)
+//3. 构造函数/原型/实体对象的关系2(图解)
+
+
+  function Fn() {
+    this.test1 = function () {
+      console.log('test1()')
+    }
+  }
+  Fn.prototype.test2 = function () {
+    console.log('test2()')
+  }
+  var fn = new Fn()
+
+  fn.test1()
+  fn.test2()
+  console.log(fn.toString())
+  fn.test3()
+
+//1. 读取对象的属性值时: 会自动到原型链中查找
+//2. 设置对象的属性值时: 不会查找原型链, 如果当前对象中没有此属性, 直接添加此属性并设置其值
+//3. 方法一般定义在原型中, 属性一般通过构造函数定义在对象本身上
+ function Person(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+  Person.prototype.setName = function (name) {
+    this.name = name;
+  }
+  Person.prototype.sex = '男';
+
+  var p1 = new Person('Tom', 12)
+  p1.setName('Jack')
+  console.log(p1.name, p1.age, p1.sex)
+  p1.sex = '女'
+  console.log(p1.name, p1.age, p1.sex)
+
+  var p2 = new Person('Bob', 23)
+  console.log(p2.name, p2.age, p2.sex)
+```
+
+## instanceof 
+```js
+//1. instanceof是如何判断的?
+//  * 表达式: A instanceof B
+//  * 如果B函数的显式原型对象在A对象的原型链上, 返回true, 否则返回false
+//2. Function是通过new自己产生的实例
+function Foo() {  }
+  var f1 = new Foo();
+  console.log(f1 instanceof Foo);
+  console.log(f1 instanceof Object);
+
+  //案例2
+  console.log(Object instanceof Function)
+  console.log(Object instanceof Object)
+  console.log(Function instanceof Object)
+  console.log(Function instanceof Function)
+  function Foo() {}
+  console.log(Object instanceof  Foo);
+```
+
+## 原型链面试题
+```js
+//1
+var A = function() {
+
+  }
+  A.prototype.n = 1
+
+  var b = new A()
+
+  A.prototype = {
+    n: 2,
+    m: 3
+  }
+
+  var c = new A()
+  console.log(b.n, b.m, c.n, c.m)
+
+//2
+  var F = function(){};
+  Object.prototype.a = function(){
+    console.log('a()')
+  };
+  Function.prototype.b = function(){
+    console.log('b()')
+  };
+  var f = new F();
+  f.a()
+  f.b()
+  F.a()
+  F.b()
+
+
+```
+## 变量提升和函数提升
+```js
+
+//1. 变量声明提升
+  //* 通过var定义(声明)的变量, 在定义语句之前就可以访问到
+  //* 值: undefined
+//2. 函数声明提升
+  //* 通过function声明的函数, 在之前就可以直接调用
+  //* 值: 函数定义(对象)
+    //变量提升快于函数提升
+  /*
+   面试题: 输出什么?
+   */
+  var a = 4
+  function fn () {
+    console.log(a)
+    var a = 5
+  }
+  fn()//undefine
+
+
+  /*变量提升*/
+  console.log(a1) //可以访问, 但值是undefined
+  /*函数提升*/
+  a2() // 可以直接调用
+
+  var a1 = 3
+  function a2() {
+    console.log('a2()')
+  }
+
+//重要
+fn()//报错 因为这是变量提升，不是函数提成，函数声明的方式不一样
+var fn = function(){
+  console.log('fn')
+}
+```
+
+## 执行上下文面试题
+```js
+console.log('global begin: '+ i)
+  var i = 1
+  foo(1);
+  function foo(i) {
+    if (i == 4) {
+      return;
+    }
+    console.log('foo() begin:' + i);
+    foo(i + 1);
+    console.log('foo() end:' + i);
+  }
+  console.log('global end: ' + i)
+```
+
+## 作用域面试题
+```js
+
+var x = 10;
+  function fn() {
+    console.log(x);
+  }
+  function show(f) {
+    var x = 20;
+    f();
+  }
+  show(fn);
+
+  //
+  var fn = function () {
+    console.log(fn)
+  }
+  fn()
+
+  var obj = {
+    fn2: function () {
+      console.log(fn2)
+    }
+  }
+  obj.fn2()
+```
+
+## 闭包面试
+```js
+//代码片段一
+  var name = "The Window";
+  var object = {
+    name: "My Object",
+    getNameFunc: function () {
+      return function () {
+        return this.name;
+      };
+    }
+  };
+  console.log(object.getNameFunc()());  //?
+
+//代码片段二
+  var name2 = "The Window";
+  var object2 = {
+    name2: "My Object",
+    getNameFunc: function () {
+      var that = this;
+      return function () {
+        return that.name2;
+      };
+    }
+  };
+  console.log(object2.getNameFunc()()); //?
+```
+
 <ClientOnly>
 <buttom-view></buttom-view>
 </ClientOnly>
+
+
+
