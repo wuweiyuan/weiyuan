@@ -3,6 +3,7 @@
 创建 store 对象
 
 ```js
+//vuex是单数据流的
 const store = new Vuex.Store({
   //state 中存放的就是全局共享的数据
   state: {

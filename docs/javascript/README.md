@@ -397,7 +397,7 @@ Number.isInteger(5.5);
 let arr = [7, 8, 9];
 arr = new Proxy(arr, {
   get(target, prop) {
-    console.log(target, prop);
+    console.log(target, prop);//target数组本身  prop传进来的值
     return prop in target ? target[prop] : "error";
   },
 });
@@ -423,11 +423,21 @@ let userInfo = {
   _password: "*****",
 };
 userInfo = new Proxy(userInfo, {
+  //ownkeys是管理遍历的，这个例子就是不让_password给遍历出来
   ownKeys(target) {
     return Object.keys(target).filter((item) => {
       return !item.startsWith("_");
     });
   },
+  //拦截删除
+  deleteProperty(target, prop) { // 拦截删除
+        if (prop.startsWith('_')) {
+            throw new Error('不可删除')
+        } else {
+            delete target[prop]
+            return true
+        }
+    },
 });
 for (let key in userInfo) {
   console.log(key);
@@ -512,10 +522,27 @@ function* foo() {
   }
 }
 let f = foo();
-console.log(foo.next());
-console.log(foo.next());
-console.log(foo.next());
-console.log(foo.next());
+console.log(f.next());
+console.log(f.next());
+console.log(f.next());
+console.log(f.next());
+
+//yield后面是返回值
+//f.next(12)里面的12表达的是上一个yield的返回值，看下面的例子就明白了
+function* wwy(x){
+  let y = 2 * (yield(x+1))
+  let z = yield(y/3)
+  return x + y + z 
+}
+let g = wwt(5)
+//这样执行
+g.next() //6
+g.next() //NaN
+g.next() //NaN
+//如果这样执行
+g.next() //6
+g.next(12)  //y=24 8
+g.next(13) // z = 13 y =24 x=5  42 
 ```
 
 ## Module
@@ -1284,6 +1311,162 @@ this.onmessage = function (event) {
 
 ```
 
+## 宏任务微任务 事件循环
+```js
+//宏任务包括：
+//setInterval
+//setTimeout
+//setImmediate（node.js）
+//XHR 回调
+//事件回调（鼠标键盘事件）
+//indexedDB 数据库等 I/O 操作
+//UI rendering
+//
+
+//微任务包括：
+//Promise.then catch finally
+//process.nextTick（node.js）
+//MutationObserver
+//Object.observe（已被弃用）
+
+//本人自己总结下，没什么专业术语的那种
+//1.一开始是先执行宏任务，第一次是全部执行
+//2.第一次宏任务全部执行完后，就执行微任务，微任务也是全部执行完
+//3.重要的来了，然后再执行宏任务，但是只执行一个，后面暂不执行
+//4.然后再执行全部的微任务
+//5.之后就重复3.4步骤循环
+//例子
+//微事件1
+process.nextTick(function() {
+    console.log('6');-
+})
+//主线程直接执行
+new Promise(function(resolve) {
+    console.log('7');-
+    resolve();
+}).then(function() {
+    //微事件2
+    console.log('8')-
+})
+//丢到宏事件队列中
+setTimeout(function() {
+    console.log('9');-
+    process.nextTick(function() {
+        console.log('10');
+    })
+    new Promise(function(resolve) {
+        console.log('11');-
+        resolve();
+    }).then(function() {
+        console.log('12')
+    })
+})
+//输出 1 7 6 8 2 4 3 5  9  11 10 12
+```
+
+## js的new
+```js
+//new操作符新建了一个空对象，这个对象原型指向构造函数的prototype，执行构造函数后返回这个对象
+//
+//1、创建一个空的对象
+//2、链接到原型
+//3、绑定this指向，执行构造函数
+//4、确保返回的是对象 
+```
+
+## axios拦截器
+```js
+//其实是需要两步，路由拦截和axios拦截
+//就用vue来说
+//首先在定义路由的时候就需要多添加一个自定义字段requireAuth，用于判断该路由的访问是否需要登录。如果用户已经登录，则顺利进入路由， 否则就进入登录页面。
+
+const routes = [
+    {
+        path: '/',
+        name: '/',
+        component: Index
+    },
+    {
+        path: '/repository',
+        name: 'repository',
+        meta: {
+            requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
+        },
+        component: Repository
+    },
+    {
+        path: '/login',
+        name: 'login',
+        component: Login
+    }
+];
+//定义完路由后，我们主要是利用vue-router提供的钩子函数beforeEach()对路由进行判断。
+
+router.beforeEach((to, from, next) => {
+    if (to.meta.requireAuth) {  // 判断该路由是否需要登录权限
+        if (store.state.token) {  // 通过vuex state获取当前的token是否存在
+            next();
+        }
+        else {
+            next({
+                path: '/login',
+                query: {redirect: to.fullPath}  // 将跳转的路由path作为参数，登录成功后跳转到该路由
+            })
+        }
+    }
+    else {
+        next();
+    }
+})
+//每个钩子方法接收三个参数：
+//
+//to: Route: 即将要进入的目标 路由对象
+//from: Route: 当前导航正要离开的路由
+//next: Function: 一定要调用该方法来 resolve 这个钩子。执行效果依赖 next 方法的调用参数。
+//next(): 进行管道中的下一个钩子。如果全部钩子执行完了，则导航的状态就是 confirmed （确认的）。
+//next(false): 中断当前的导航。如果浏览器的 URL 改变了（可能是用户手动或者浏览器后退按钮），那么 URL 地址会重置到 from 路由对应的地址。
+//next('/') 或者 next({ path: '/' }): 跳转到一个不同的地址。当前的导航被中断，然后进行一个新的导航。
+//确保要调用 next 方法，否则钩子就不会被 resolved。
+
+
+
+//下面是拦截器
+//要想统一处理所有http请求和响应，就得用上 axios 的拦截器。通过配置http response inteceptor，当后端接口返回401 Unauthorized（未授权），让用户重新登录
+
+
+// http request 拦截器
+axios.interceptors.request.use(
+    config => {
+        if (store.state.token) {  // 判断是否存在token，如果存在的话，则每个http header都加上token
+            config.headers.Authorization = `token ${store.state.token}`;
+        }
+        return config;
+    },
+    err => {
+        return Promise.reject(err);
+    });
+
+// http response 拦截器
+axios.interceptors.response.use(
+    response => {
+        return response;
+    },
+    error => {
+        if (error.response) {
+            switch (error.response.status) {
+                case 401:
+                    // 返回 401 清除token信息并跳转到登录页面
+                    store.commit(types.LOGOUT);
+                    router.replace({
+                        path: 'login',
+                        query: {redirect: router.currentRoute.fullPath}
+                    })
+            }
+        }
+        return Promise.reject(error.response.data)   // 返回接口返回的错误信息
+    });
+    
+```
 <ClientOnly>
 <buttom-view></buttom-view>
 </ClientOnly>
