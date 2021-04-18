@@ -454,5 +454,189 @@ export default {
 h函数的执行会变成虚拟节点，
 虚拟节点经过diff或者patch就会在界面上进行显示
 抽象语法树是不会进行diff的
+```
+
+## v-model
+```js
+//注意这是2.x版本
+//在 2.x 中，在组件上使用 v-model 相当于绑定 value prop 和 input 事件：
+<ChildComponent v-model="pageTitle" />
+
+// 是以下的简写:
+
+<ChildComponent :value="pageTitle" @input="pageTitle = $event" > </ChildComponent>
+
+//如果要将属性或事件名称更改为其他名称，则需要在 ChildComponent 组件中添加 model 选项：
+//ParentComponent.vue 
+
+<ChildComponent v-model="pageTitle" />
+
+// ChildComponent.vue
+
+export default {
+  model: {
+    prop: 'title',
+    event: 'change'
+  },
+  props: {
+    // 这将允许 `value` 属性用于其他用途
+    value: String,
+    // 使用 `title` 代替 `value` 作为 model 的 prop
+    title: {
+      type: String,
+      default: 'Default title'
+    }
+  }
+}
+
+//所以，在这个例子中 v-model 是以下的简写：
+<ChildComponent :title="pageTitle" @change="pageTitle = $event" />
+//例子
+//父组件
+<template>
+    <div>
+        <search v-model="keywords"></search>
+        <button @click="submit">提交</button>
+    </div>
+</template>
+<script>
+import search from '@/components/index/search.vue'
+export default {
+    data() {
+        return {
+            keywords: ''
+        }
+    },
+    components: {
+        search
+    },
+    methods: {
+        submit() {
+            console.log('keywords:', this.keywords)
+        }
+    }
+}
+</script>
+//子组件
+<template>
+    <div>
+        <input :value="value" @input="$emit('input', $event.target.value)" type="text" name="keywords">
+    </div>
+</template>
+<script>
+export default {
+    props: ['value']
+}
+</script>
+
+//使用 v-bind.sync
+//在某些情况下，我们可能需要对某一个 prop 进行“双向绑定”(除了前面用 v-model 绑定 prop 的情况)。为此，我们建议使用 update:myPropName 抛出事件。//例如，对于在上一个示例中带有 title prop 的 ChildComponent，我们可以通过下面的方式将分配新 value 的意图传达给父级：
+this.$emit('update:title', newValue)
+//如果需要的话，父级可以监听该事件并更新本地 data property。例如：
+<ChildComponent :title="pageTitle" @update:title="pageTitle = $event" />
+//为了方便起见，我们可以使用 .sync 修饰符来缩写，如下所示：
+<ChildComponent :title.sync="pageTitle" />
+//例子
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.12/vue.js"></script>
+</head>
+<body>
+
+<div id="app">
+
+	<!-- 展示在子组件编辑时,父元素数据的变化 -->
+	data1: {{data1}} <br>
+	data2: {{data2}} <br>
+
+	<!-- 声明两个子组件,并为其传入父元素的变量,作为初始值参数 -->
+	<!-- 通过sync修饰符配合组件内的$emit('update:prop',...) -->
+	<!-- 使父组件(根vue实例)和子组件的数据进行同步 -->
+	son1: <cpnt :prop.sync="data1"></cpnt> <br>
+	son2: <cpnt :prop.sync="data2"></cpnt>
+
+</div>
+
+<script type="text/javascript">
+
+	//全局注册一个组件:cpnt
+	//功能为一个普通表单
+	//从复元素的一个变量获得初始值
+	//并在输入时体型父元素修改变量
+	//该组件和外界唯一的接口就是prop
+	Vue.component('cpnt',{
+		props:['prop'],
+		template:`<input type='text' v-model="value">`,
+		//通过v-model与value保持同步
+		data(){
+			return {
+				value:this.prop
+			}
+		},
+		watch:{//监听value的变化
+			value(new_val){
+				this.$emit('update:prop',new_val)
+			}
+		}
+	})
+
+	//一个data中有两个变量的vue实例
+	let vm=new Vue({
+		el:"#app",
+		data:{
+			data1:"",
+			data2:''
+		}
+	})
+
+</script>
+</body>
+</html>
+
+//下面是3.x版本的v-model
+
+//在 3.x 中，自定义组件上的 v-model 相当于传递了 modelValue prop 并接收抛出的 update:modelValue 事件：
+<ChildComponent v-model="pageTitle" />
+
+//是以下的简写:
+
+<ChildComponent
+  :modelValue="pageTitle"
+  @update:modelValue="pageTitle = $event"
+/>
+
+
+//例子
+//父组件
+<test v-model="aaaa"></test>
+<div>父组件{{ aaaa }}</div>
+const aaaa: Ref<string> = ref("sssss");
+
+//子组件
+//test.js
+<template>
+  <div id="shabi">
+    <input type="text" :value="modelValue" @input="handleInput" />
+    <div>自组件{{ modelValue }}</div>
+  </div>
+</template>
+
+<script lang='ts'>
+// import func from "vue-editor-bridge";
+
+export default {
+  props: ["modelValue"],
+  setup(props, context) {
+    const handleInput = function (e: any) {
+      console.log("ssss", props, props.modelValue);
+      context.emit("update:modelValue", e.target.value + "1");
+    };
+    return {
+      handleInput,
+    };
+  },
+};
+</script>
 
 ```
