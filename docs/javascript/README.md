@@ -1465,7 +1465,91 @@ axios.interceptors.response.use(
         }
         return Promise.reject(error.response.data)   // 返回接口返回的错误信息
     });
-    
+
+```
+
+## 防抖和节流函数
+```js
+//防抖和节流的作用都是防止函数被多次调用，
+//防抖函数在高频事件结束后，n毫秒后调用一次函数
+//防抖封装
+function debounce(fnc,wait){
+  let timeout = null;
+  return function (){
+    let context = this;
+    let arg = arguments;
+    if(timeout){
+      clearTimeout(timeout)
+    }
+    timeout = setTimeout(()=>{
+      fnc.apply(context,arg)
+    },wait)
+  }
+}
+//节流函数会在高频事件触发的过程中每隔n毫秒调用一次函数
+//节流封装
+function throttle(fnc,wait){
+  let timeout = null;
+  return function(){
+    let context = this;
+    let arg = arguments;
+    if(!timeout){
+      timeout = setTimeout(()=>{
+        cleatTimeout(timeout)
+        fnc.apply(context,args)
+      },wait)
+    }
+  }
+}
+```
+
+## js获取路由参数
+```js
+  function getUrl(str){
+    let query = window.location.search.substring(1)
+    let arr = query.split('&')
+    for(let i = 0 ; i < arr.length ; i++){
+      let item = arr[i].split('=')
+      if(item[0] == str){
+        return item[1]
+      }
+    }    
+     return(false);
+  }
+```
+
+## 比typeof运算符更准确的类型判断
+```sh
+不同数据类型的Object.prototype.toString方法返回值如下。
+数值：返回[object Number]。
+字符串：返回[object String]。
+布尔值：返回[object Boolean]。
+undefined：返回[object Undefined]。
+null：返回[object Null]。
+数组：返回[object Array]。
+arguments 对象：返回[object Arguments]。
+函数：返回[object Function]。
+Error 对象：返回[object Error]。
+Date 对象：返回[object Date]。
+RegExp 对象：返回[object RegExp]。
+其他对象：返回[object Object]。
+
+Object.prototype.toString.call(2) // "[object Number]"
+Object.prototype.toString.call('') // "[object String]"
+Object.prototype.toString.call(true) // "[object Boolean]"
+Object.prototype.toString.call(undefined) // "[object Undefined]"
+Object.prototype.toString.call(null) // "[object Null]"
+Object.prototype.toString.call(Math) // "[object Math]"
+Object.prototype.toString.call({}) // "[object Object]"
+Object.prototype.toString.call([]) // "[object Array]"
+
+利用这个特性，可以写出一个比 typeof 运算符更准确判断函数
+
+var type = function (o){
+  var s = Object.prototype.toString.call(o)
+  return s.match(/\[object (.*?)\]/)[1].toLowerCase()
+}
+
 ```
 <ClientOnly>
 <buttom-view></buttom-view>
