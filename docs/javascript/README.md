@@ -1577,6 +1577,130 @@ var type = function (o){
 
 (new RegExp('1\\+1')).test('1+1')
 // true
+
+//字符类字符类（class）表示有一系列字符可供选择，只要匹配其中一个就可以了。所有可供选择的字符都放在方括号内，比如[xyz] 表示x、y、z之中任选一个匹配
+
+/[abc]/.test('hello world') // false
+/[abc]/.test('apple') // true  a、b、c其中任意一个
+
+//脱字符（^ 排除）如果方括号内的第一个字符是[^]，则表示除了字符类之中的字符，其他字符都可以匹配。比如，[^xyz]表示除了x、y、z之外都可以匹配。
+/[^abc]/.test('bbc news') // true  字符串中包含了a、b、c以为的字符
+/[^abc]/.test('bbc') // false  字符串中没有除了a、b、c以外的字符
+
+//连字符（- 字符连续范围） 某些情况下，对于连续序列的字符，连字符（-）用来提供简写形式，表示字符的连续范围。比如，[abc]可以写成[a-c]，[0123456789]可以写成[0-9]，同理[A-Z]表示26个大写字母。
+
+
+/a-z/.test('b') // false
+/[a-z]/.test('b') // true
+
+//预定义模式 
+
+//    \d 匹配0-9之间的任一数字，相当于[0-9]。(数字)
+//    \D 匹配所有0-9以外的字符，相当于[^0-9]。(非数字)
+//    \w 匹配任意的字母、数字和下划线，相当于[A-Za-z0-9_]。(字母、数字、下划线)
+//    \W 除所有字母、数字和下划线以外的字符，相当于[^A-Za-z0-9_]。(非：字母、数字、下划线)
+//    \s 匹配空格（包括换行符、制表符、空格符等），相等于[ \t\r\n\v\f]。(空格)
+//    \S 匹配非空格的字符，相当于[^ \t\r\n\v\f]。(非空格)
+//    \b 匹配词的边界。(单词边界)
+//    \B 匹配非词边界，即在词的内部。(非单词边界)
+
+//重复类 （ {n} {n,} {n,m} ）
+//模式的精确匹配次数，使用大括号（{}）表示。{n}表示恰好重复n次，{n,}表示至少重复n次，{n,m}表示重复不少于n次，不多于m次。
+/lo{2}k/.test('look') // true  2个o
+/lo{2,5}k/.test('looook') // true   2到5个o
+
+
+//量词符（?）（*）（+）
+
+//   ? 问号表示某个模式出现0次或1次，等同于{0, 1}。
+//   * 星号表示某个模式出现0次或多次，等同于{0,}。
+//   + 加号表示某个模式出现1次或多次，等同于{1,}。
+
+
+
+//修饰符
+//g 修饰符 （全局匹配）
+var regex = /b/g;
+var str = 'abba';
+
+regex.test(str); // true
+regex.test(str); // true
+regex.test(str); // false
+
+//i 修饰符 （不区分大小写）
+/abc/.test('ABC') // false
+/abc/i.test('ABC') // true
+
+//m 修饰符（让^和$识别换行符）
+//m修饰符表示多行模式（multiline），会修改^和$的行为。默认情况下（即不加m修饰符时），^和$匹配字符串的开始处和结尾处，加上m修饰符以后，^和$还会匹配行首和行尾，即^和$会识别换行符（\n）。
+/world$/.test('hello world\n') // false
+/world$/m.test('hello world\n') // true
+
+/^b/m.test('a\nb') // true
+//上面代码要求匹配行首的b，如果不加m修饰符，就相当于b只能处在字符串的开始处。加上m修饰符以后，换行符\n也会被认为是一行的开始。
+
+```
+
+## new命令原理
+```js
+//创建一个空对象，作为将要返回的实例对象。
+
+//将这个空对象的原型，指向构造函数的prototype属性。
+
+//将这个空对象赋值给函数内部的this关键字。
+
+//开始执行构造函数内部的代码。（代码中this指向空对象（实例对象））
+
+//返回实例对象（或自定义对象）
+//也就是说，构造函数内部，this指的是一个新生成的空对象，所有针对this的操作，都会发生在这个空对象上。构造函数之所以叫“构造函数”，就是说这个函数的目的，就是操作一个空对象（即this对象），将其“构造”为需要的样子。
+
+//如果构造函数内部有return语句，而且return后面跟着一个对象，new命令会返回return语句指定的对象；否则，就会不管return语句，返回this对象。
+
+var Vehicle = function () {
+  this.price = 1000;
+  return 1000; // 1000 非对象，被忽略，返回的是this对象；如果是return {}，则会返回{}
+    
+};
+
+(new Vehicle()) === 1000
+// false
+
+//上面代码中，构造函数Vehicle的return语句返回一个数值。这时，new命令就会忽略这个return语句，返回“构造”后的this对象。
+
+//但是，如果return语句返回的是一个跟this无关的新对象，new命令会返回这个新对象，而不是this对象。这一点需要特别引起注意。
+
+//重要，new命令简化的内部流程，可以用下面的代码表示
+
+// 构造函数
+function Person(name,age){
+    this.name = name
+    this.age = age
+}
+
+//自定义_new
+function _new(){
+  var arg = [].slice.call(arguments)
+  var constructor = arg.shift()
+  var context = Object.create(constructor.prototype)
+  var result = constructor.apply(context,arg)
+  return (typeof result == 'object' && result != null) ? resulr : context
+}
+//自定义_new2
+function _new2(/* 构造函数 */ constructor, /* 构造函数参数 */ params){
+  var context = Object.create(constructor.prototype)
+  var result = constructor.apply(context,params)
+  return (typeof result == 'object' && result != null) ? result :context
+}
+var actor = _new(Person, '张三', 28);
+actor.name // 张三
+
+// 通过自定义_new2 返回实例
+var actor2 = _new2(Person, ['李四', 29]);
+actor2.name // 李四
+
+// 通过new命令 返回实例
+var actor3 = new Person('王五',30)
+actor3.name // 王五
 ```
 <ClientOnly>
 <buttom-view></buttom-view>
