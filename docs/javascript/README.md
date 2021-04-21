@@ -1702,6 +1702,33 @@ actor2.name // 李四
 var actor3 = new Person('王五',30)
 actor3.name // 王五
 ```
+## Array.prototype.slice.call(a) 类数组 转数组原理
+```js
+var objArr = { // 类数组对象
+    0:'a',
+    1:'b',
+    2:'c',
+    length:3
+}
+
+var arr = Array.prototype.slice.call(objArr) // 执行数组的slice方法，并把obj指定为方法的this
+// 或 arr = [].slice.call(obj)
+
+arr // ['a','b','c']
+
+//上面代码中，objArr是一个类似数组的对象，使用call调用数组的slice方法，指定objArr为slice方法内部的this，slice方法返回值赋给arr。
+
+//另外来看看数组slice方法的内部实现原理
+Array.prototype.slice=function(start,end){  //数组方法slice的底层内部实现
+    var result = new Array(); //新数组
+    var start = start || 0;
+    var end = end || this.length; //this指向调用的对象，用了call之后，改变this的指向，指向传进来的对象
+    for(var i=start; i<end; i++){
+        result.push(this[i]);
+    }
+    return result;	//返回的为一个新的数组
+}
+```
 <ClientOnly>
 <buttom-view></buttom-view>
 </ClientOnly>
