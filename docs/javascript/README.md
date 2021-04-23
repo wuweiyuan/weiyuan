@@ -1729,6 +1729,44 @@ Array.prototype.slice=function(start,end){  //数组方法slice的底层内部�
     return result;	//返回的为一个新的数组
 }
 ```
+
+## cookie基本知识
+```sh
+https://www.cnblogs.com/Darren_code/archive/2011/11/24/Cookie.html
+```
+
+## ajax
+```sh
+具体来说，AJAX 包括以下几个步骤。
+
+1.创建 XMLHttpRequest 实例
+2.发出 HTTP 请求
+3.接收服务器传回的数据
+4.更新网页数据
+
+```
+
+## storage
+```sh
+Storage 接口用于脚本在浏览器保存数据。两个对象部署了这个接口：window.sessionStorage和window.localStorage。
+Storage.setItem()
+Storage.getItem()
+Storage.removeItem()
+Storage.clear()
+Storage.key()
+```
+
+## History
+```sh
+window.history属性指向 History 对象，它表示当前窗口的浏览历史。
+属性
+History.length：当前窗口访问过的网址数量（包括当前网页）
+方法
+History.back()、History.forward()、History.go()
+History.back()：移动到上一个网址，等同于点击浏览器的后退键。对于第一个访问的网址，该方法无效果。
+History.forward()：移动到下一个网址，等同于点击浏览器的前进键。对于最后一个访问的网址，该方法无效果。
+History.go()：接受一个整数作为参数，以当前网址为基准，移动到参数指定的网址，比如go(1)相当于forward()，go(-1)相当于back()。如果参数超过实际存在的网址范围，该方法无效果；如果不指定参数，默认参数为0，相当于刷新当前页面。
+```
 <ClientOnly>
 <buttom-view></buttom-view>
 </ClientOnly>
