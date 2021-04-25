@@ -1767,6 +1767,65 @@ History.back()：移动到上一个网址，等同于点击浏览器的后退键
 History.forward()：移动到下一个网址，等同于点击浏览器的前进键。对于最后一个访问的网址，该方法无效果。
 History.go()：接受一个整数作为参数，以当前网址为基准，移动到参数指定的网址，比如go(1)相当于forward()，go(-1)相当于back()。如果参数超过实际存在的网址范围，该方法无效果；如果不指定参数，默认参数为0，相当于刷新当前页面。
 ```
+
+## 性能高的几种去重方法
+```js
+//耗时约23ms，ES5标准中性能最高
+function fnc(arr){
+    arr = arr.sort()
+    var result = [arr[0]]
+    for(let i = 1 ; i < arr.length ; i++){
+        arr[i] !== arr[i-1] && result.push(arr[i]) 
+    }
+    return result
+}
+//ES6的Set数据结构，耗时约20ms，性能高，代码简洁
+Array.from(new Set([...arr]))
+
+//耗时约16ms，所有方法中 性能最高
+function fnc1(arr){
+    var result = []
+    var obj = {}
+    for(let item of arr){
+        if(!obj[item]){
+            result.push(item)
+            obj[item] = true
+        } 
+    }
+    return result
+}
+
+
+```
+
+## js随机打乱数组
+```js
+        function getRandomInt(min,max){
+            return Math.floor(Math.random() * (max - min + 1) + min)
+        }
+        function fnc(arr){
+            for(let i = 0; i < arr.length ; i++){
+                let j = getRandomInt(0,i)
+                let a = arr[i]
+                arr[i] = arr[j]
+                arr[j] = a                 
+            }
+            return arr           
+        }
+       
+        var arr = [1,2,3,4]
+        console.log(fnc(arr))
+```
+
+##  判断是否为移动端浏览器
+```js
+const flag = navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i);
+if(flag){
+    // 移动端
+} else {
+    // PC端
+}
+```
 <ClientOnly>
 <buttom-view></buttom-view>
 </ClientOnly>
