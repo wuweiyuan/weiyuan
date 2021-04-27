@@ -33,6 +33,7 @@ module.exports = {
           { text: "HTML", link: "/html/" },
           { text: "OSS", link: "/OSS/" },
           { text: "webpack", link: "/webpack/" },
+          { text: "算法", link: "/sum/" },
         ],
       },
 
@@ -92,6 +93,10 @@ module.exports = {
           {
             title: "webpack",
             path: "/webpack/",
+          },
+          {
+            title: "算法",
+            path: "/sum/",
           },
         ],
       },

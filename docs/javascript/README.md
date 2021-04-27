@@ -1826,6 +1826,59 @@ if(flag){
     // PC端
 }
 ```
+
+## 深拷贝
+```js
+//乞丐版深拷贝
+  var obj1 = {
+    a: 1,
+    b: 2,
+    c: 3
+}
+var objString = JSON.stringify(obj1);
+var obj2 = JSON.parse(objString);
+obj2.a = 5;
+console.log(obj1.a);  // 1
+console.log(obj2.a); // 5
+
+//乞丐版深拷贝2
+var obj1 = {
+    a: 1,
+    b: 2,
+    c: 3
+}
+var obj2 = Object.assign({}, obj1);
+obj2.b = 5;
+console.log(obj1.b); // 2
+console.log(obj2.b); // 5
+
+//真正的深拷贝，递归
+//面试够用
+function deepClone(data){
+    if(typeof data === 'object'){
+        var result = data.constructor == Object ? {} : []
+        for(let item in data){
+            result[item] = typeof data[item] == 'object' ? deepClone(data[item]) : data[item]
+        }
+    }else{
+        var result = data
+    }
+    return result
+}
+```
+
+## a--和--a
+```js
+var a = 3
+while(a--){
+  console.log(a)
+}
+//分开执行，不然死循环
+var a = 3
+while(--a){
+  console.log(a)
+}
+```
 <ClientOnly>
 <buttom-view></buttom-view>
 </ClientOnly>
