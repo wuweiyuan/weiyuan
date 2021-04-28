@@ -297,3 +297,65 @@ TCP（Transmission Control Protocol，传输控制协议）是基于连接的协
 UDP（User Data Protocol，用户数据报协议）是与TCP相对应的协议。它是面向非连接的协议，它不与对方建立连接，而是直接就把数据包发送过去！
 UDP适用于一次只传送少量数据、对可靠性要求不高的应用环境
 ```
+
+## HTTP和HTTPS
+```sh
+1、HTTP协议通常承载于TCP协议之上，在HTTP和TCP之间添加一个安全协议层（SSL或TSL），这个时候，就成了我们常说的HTTPS
+2、默认HTTP的端口号为80，HTTPS的端口号为443
+
+HTTPS 相对于 HTTP 性能上差点，因为多了 SSL/TLS 的几次握手和加密解密的运算处理，但是加密解密的运算处理已经可以通过特有的硬件来加速处理。
+```
+
+## 一个页面从输入 URL 到页面加载显示完成，这个过程中都发生了什么？
+```sh
+1、浏览器根据请求的URL交给DNS域名解析，找到真实IP，向服务器发起请求（TCP三次握手）；
+2、服务器交给后台处理完成后返回数据，浏览器接收文件（HTML、JS、CSS、图象等）；
+3、浏览器对加载到的资源（HTML、JS、CSS等）进行语法解析，建立相应的内部数据结构（如HTML的DOM）；
+4、载入解析到的资源文件，渲染页面，完成。
+```
+
+## 安全
+```sh
+1.sql注入：窃取数据库内容
+  攻击方式：输入一个sql片段，最终拼接成一段攻击代码
+  比如本来的sql语句是 select * from users where username='zhangsan' and password='123'
+  重要的来了 如果'zhangsan'变成'zhangsan'--'
+  整条语句就变成select * from users where username='zhangsan'--' and password='123'
+  那后面的and password='123'就直接注释掉了，这样就相当来说，密码就无效了
+  还可以更残忍的
+  select * from users where username='zhangsan';delete from users;--' and password='123'
+  这样直接把表都给删了
+
+  预防措施：使用mysql的escape函数处理输入内容即可
+  const mysql = require('mysql')
+  mysql.escape(username)
+
+2.XSS攻击：窃取前端的cookie内容
+  攻击方式：在页面展示的内容中参杂js代码，以获取网页信息
+  预防措施：转换生产js的特殊字符
+  给关键cookies使用http-only
+  npm install xss --save
+  const xss = require('xss')
+  xss('里面就是页面传进来的信息（变量）')
+
+3.CSRF
+  攻击一般发起在第三方网站，而不是被攻击的网站。被攻击的网站无法防止攻击发生。
+  攻击利用受害者在被攻击网站的登录凭证，冒充受害者提交操作；而不是直接窃取数据。
+  整个过程攻击者并不能获取到受害者的登录凭证，仅仅是“冒用”。
+  跨站请求可以用各种方式：图片URL、超链接、CORS、Form提交等等。部分请求方式可以直接嵌入在第三方论坛、文章中，难以进行追踪。
+  CSRF通常是跨域的，因为外域通常更容易被攻击者掌控。但是如果本域下有容易被利用的功能，比如可以发图和链接的论坛和评论区，攻击可以直接在本域下进行，而且这种攻击更加危险。
+
+  防护策略
+  上文中讲了CSRF的两个特点：
+    CSRF（通常）发生在第三方域名。
+    CSRF攻击者不能获取到Cookie等信息，只是使用。
+  针对这两点，我们可以专门制定防护策略，如下：
+
+    阻止不明外域的访问
+      同源检测
+      Samesite Cookie
+    提交时要求附加本域才能获取的信息
+      CSRF Token
+      双重Cookie验证
+  （https://www.jianshu.com/p/8d7051ffec72?tt_from=weixin）
+```
