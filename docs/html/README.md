@@ -359,3 +359,130 @@ HTTPS 相对于 HTTP 性能上差点，因为多了 SSL/TLS 的几次握手和�
       双重Cookie验证
   （https://www.jianshu.com/p/8d7051ffec72?tt_from=weixin）
 ```
+
+## 使用data-的好处
+```js
+
+<ul>
+  <li onclick="showDetails(this)" id="owl" data-animal-type="鸟类">喜鹊</li>
+  <li onclick="showDetails(this)" id="salmon" data-animal-type="鱼类">金枪鱼</li>
+  <li onclick="showDetails(this)" id="tarantula" data-animal-type="蜘蛛">蝇虎</li>
+</ul>
+function showDetails(animal) {
+  var animalType = animal.getAttribute("data-animal-type");
+  alert(animal.innerHTML + "是一种" + animalType + "。");
+}
+//data-* 属性用于存储页面或应用程序的私有自定义数据。
+//
+//data-* 属性赋予我们在所有 HTML 元素上嵌入自定义 data 属性的能力。
+//
+//存储的（自定义）数据能够被页面的 JavaScript 中利用，以创建更好的用户体验（不进行 Ajax 调用或服务器端数据库查询）。
+//
+//data-* 属性包括两部分：
+//好处
+//1.自定义属性，可以被js很好的操作
+//
+//2.H5的新属性
+//
+//3.通过js的element.dataset.*或jQuery的data('*')拿到，*可以为url等字符
+//
+//4.框架的数据绑定，例如data-ng-if="cs==1"
+```
+
+## meta标签
+[点击跳转](https://www.runoob.com/tags/tag-meta.html)
+
+## 渐进式渲染简述
+```sh
+什么是渐进式渲染？
+
+渐进式渲染是用来提高网页性能，以尽快呈现页面的技术。
+
+例如：
+
+图片懒加载——页面上的图片不会一次性的全部加载，当用户滚动页面到图片位置时，JS将加载并显示图像。
+确定显示内容的优先级——为了尽快将页面呈现给用户，页面只将一小部分CSS，脚本，内容加载，然后在延时加载或者监听事件来加载。
+异步加载HTML片段——当页面通过后台渲染时，把HTML拆分，通过异步请求，分块发送给浏览器。
+```
+
+## 移动端
+```sh
+px:逻辑像素，浏览器使用的抽象单位
+dp,pt：物理像素
+dpr:设备像素缩放比
+
+计算公式：1px = (dpr)²*dp
+最佳viewport设置
+<meta name='viewport' content='width=device-width, initial-scale=1.0,user-scalabel=no'>
+```
+## attribute和property的区别
+```
+一：Attribute和Property的区别
+
+1.含义区别
+
+首先在定义上更准确的来说，Attribute和Property分别为特性和属性，作为区别。
+其次，这样理解下来，我们知道Attribute就是DOM节点自带属性，例如我们在HTML中常用的id,class,src,title,alt等。而Property则是这个DOM元素作为对象，其附加的属性或者内容，例如childNodes，firstChild等。
+
+另外我们常把他们弄混淆是因为，有些例如id,class,title常用的Attribute已经被作为Property附加在DOM对象上，也可以取值和赋值。但是自定义的Attribute就不能了，例如：
+
+//这里的title1是自定义属性不能作为property
+<div id="div1" class="divClass" title="divTitle" title1="divTitle1">自定义attribute</div>
+
+2.取值和赋值区别
+
+Attribute取值和赋值
+
+//attribute取值
+  getAttribute()
+  eg:var id = div1.getAttribute("id")
+     var id = div1.getAttribute("title1")
+//attribute赋值
+  getAttribute(attribute,value)  //value只能是字符串形式
+  eg:div1.setAttribute('class', 'a');
+     div1.setAttribute('title1', 'asd');  //自定义属性也可
+
+Property取值和赋值
+
+//通过'.'号获取property
+  var id = div1.id;
+  var className = div1.className; //相当于div1.getAttribute('class')
+//通过'='赋予property
+  div1.className = 'a';
+  div1.align = 'center';
+```
+
+## document load和document DOMContentLoaded两个事件的区别
+```
+区别
+DOMContentLoaded: DOM解析完成即触发此事件，不等待styles, images等资源的加载
+load：依赖的资源也已加载完成
+DOMContentLoaded绑定到document，load绑定到window
+document.addEventListener('DOMContentLoaded', function(event) {
+  console.log("DOM fully loaded and parsed");  // 先打印
+});
+window.addEventListener('load', function(event) {
+  console.log("img loaded");  // 后打印
+}); 
+何时触发这两个事件？
+1.当 onload 事件触发时，页面上所有的DOM，样式表，脚本，图片，flash都已经加载完成了。
+
+2.当 DOMContentLoaded 事件触发时，仅当DOM加载完成，不包括样式表，图片，flash。
+
+
+```
+
+## dom绑定事件的两种方式
+```
+<div id='dom'>这是一个dom</div>
+第一种
+<div id='dom' onClick='func()'>这是一个dom</div>
+第二种
+document.getElementById('dom').onClick=function(){
+
+}
+第三种
+document.getElementById('dom').addEventListener('click',()=>{
+  
+})
+```

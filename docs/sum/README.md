@@ -22,5 +22,25 @@ var info = arr
     .reduce((p, k) => (p[k]++ || (p[k] = 1), p), {});
 
 console.log(info); //{ a: 3, b: 2, c: 2, d: 1 }
-//return p
+//,p 就是return p
+```
+
+## 自己练习的冒泡排序
+```js
+        var arr = [55555555555,444444,2,22];
+        //自己练习冒泡
+        function fnc(arr){
+            var len = arr.length;
+            for(let i = 0 ; i < len-1 ; i++){
+                for(let j = i+1 ; j <len; j ++){
+                    if(arr[i]>arr[j]){
+                        var tem = arr[i]
+                        arr[i] = arr[j]
+                        arr[j] = tem
+                    }
+                }
+            }
+            return arr
+        }
+        console.log(fnc(arr))
 ```

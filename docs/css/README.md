@@ -105,3 +105,83 @@ border-box：让元素维持IE传统盒模型（IE6以下版本和IE6~7的怪异
  clear:both;
 }
 ```
+
+## flex=1
+```js
+<div class='a'>
+    <div class='b'></div>
+    <div class='c'></div>
+</div>
+
+.a{
+    display:flex
+}
+.b{
+    flex:1
+}
+.c{
+    flex:2
+}
+
+//这里flex：1说明占宽三分之一 （三是2+1来的）
+```
+
+## rem
+```sh
+1.字体单位
+-值根据html根元素大小而定，同样可以作为宽度，高度等单位
+2.适配原理
+-将px替换成rem，动态修改html的font-size适配
+ 
+ //获取视窗宽度
+ let htmlWidth = document.documentElement.clientWidth || document.body.clientWidth
+ //获取视窗高度
+ let htmlDom = document.getElementsByTagName('html')[0]
+ window.addEventListener('resize',(e)=>{
+     //获取视窗宽度
+    let htmlWidth = document.documentElement.clientWidth || document.body.clientWidth
+    htmlDom.style.fontSize = htmlWidth / 10 + 'px';
+ })
+ htmlDom.style.fontSize = htmlWidth / 10 + 'px';
+ 在sass文件里
+ @function px2rem($px){
+     $rem:37.5px; 
+     @return ($px/$rem)+rem;
+ }
+```
+
+## CSS实现隐藏页面的方式
+```
+opacity：设置透明度，值为0-1。为0则页面上不显示，但是元素还在那个位置,依然可以网页交互,单纯是看不到而已。
+
+.class{
+    opacity:0;
+
+}
+
+visibility：设置隐藏。hidden为隐藏，在页面不显示，交互效果也会没有。visible为显示，
+
+.class{
+    visibility:hidden;//隐藏
+
+    visibility:visible;//显示
+
+}
+display:设置不显示和显示。注意了，这里要强调的一点是，如果你想使他的子元素显示，用display:visible是没用的。而上面两种方式是可以使用。
+
+.class {
+    display:none;
+
+}
+
+position位置，把他绝对定位了 挪到远远地。
+
+.class{
+    position:absolutely;
+
+    left:-999px;
+
+    top:-999px;
+
+}
+```
