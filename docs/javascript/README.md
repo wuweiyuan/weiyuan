@@ -1879,6 +1879,90 @@ while(--a){
   console.log(a)
 }
 ```
+
+## 设计模型
+```
+设计模式这个术语在软件工程中用来表示软件设计中经常出现的问题的通用的、可重用的解决方案。
+工厂模式
+function createPerson(name, age){
+      var o = new Object();      // 创建一个对象
+      o.name = name;
+      o.age = age;
+      o.sayName = function(){
+            console.log(this.name)
+      }
+      return o;      // 返回这个对象
+}
+var person1 = createPerson('ccc', 18)
+var person2 = createPerson('www', 18)
+
+构造函数模式
+function Person(name , age){
+  this.name = name;
+  this.age = age;
+  this.sayName = function(){
+    console.log(this.name)
+  }
+}
+
+var person1 = new Person('ccc', 18)
+var person2 = new Person('www', 18)
+person1.sayName()      // --> 'ccc'
+
+原型模式
+function Person(){
+}
+Person.prototype.name = 'ccc'
+Person.prototype.age = 18
+Person.prototype.sayName = function(){
+  console.log(this.name)
+}
+var person1 = new Person()
+person1.sayName()      // --> ccc
+
+var person2 = new Person()
+person2.sayName()      // --> ccc
+
+console.log(person1.sayName === person2.sayName)    
+
+组合使用构造函数模式和原型模式
+function Person(name, age){
+  this.name = name;
+  this.age = age;
+  this.friends = ['aaa', 'bbb']
+}
+Person.prototype = {
+  constructor: Person,
+  sayName: function(){
+    console.log(this.name)
+  }
+}
+var person1 = new Person('ccc', 18)
+var person2 = new Person('www', 18)
+person1.friends.push('ddd')
+
+console.log(person1.friends)      // --> ["aaa", "bbb", "ddd"]
+console.log(person2.friends)      // --> ["aaa", "bbb"]
+console.log(person1.friends === person2.friends)      // --> false
+console.log(person1.sayName === person2.sayName)      // --> true
+这种构造函数与原型混成的模式，是目前ECMAscript中使用最广泛、认同度最高的一种创建自定义类型的方法。可以说，这是用来定义引用类型的一种默认方式。
+
+动态原型模式
+function Person(name, age){
+  // 属性
+  this.name = name
+  this.age = age
+  // 方法
+  if(typeof this.sayName !== 'function'){
+    Person.prototype.sayName = function(){
+      console.log(this.name)
+    }
+  }
+}
+
+var person1 = new Person('ccc', 18)
+person1.sayName()      // --> ccc
+```
 <ClientOnly>
 <buttom-view></buttom-view>
 </ClientOnly>
