@@ -592,3 +592,7 @@ const socket = io();
   })
 
 ```
+
+## http缓存
+
+[点击跳转](https://www.jianshu.com/p/227cee9c8d15)

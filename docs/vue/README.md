@@ -399,6 +399,9 @@ npm run dev
 
 ## reactive：响应式数据（json/arr）
 ```js
+//ref的底层是reactive
+//reactive的底层是proxy
+//reactive要对象才会响应式，如果是简单的数据就不会响应式
 <template>
   <div>
     <p>{{time}}</p>
