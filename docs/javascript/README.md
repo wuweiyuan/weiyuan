@@ -1312,7 +1312,29 @@ this.onmessage = function (event) {
 ```
 
 ## 宏任务微任务 事件循环
-```js
+```sh
+宏任务：setTimeout、setInterval, Ajax，DOM事件
+微任务：Promise async/await
+主线程中的所有代码依次顺序执行，遇到同步则直接执行，遇到异步，则在Event Table中注册异步
+异步操作又区分为宏任务和微任务
+宏任务
+包括 整体代码script，setTimeout，setInterval ，setImmediate，I/O，UI renderingnew ，Promise* DOM渲染后触发
+微任务
+包括 Promises.(then catch finally)，process.nextTick， MutationObserver
+DOM渲染前触发
+
+宏任务和微任务的区别在于在事件循环机制中，执行的机制不同
+每次执行完所有的同步任务后，会在任务队列中取出异步任务，先将所有微任务执行完成后，才会执行宏任务
+所以可以得出结论， 微任务会在宏任务之前执行。
+我们在工作常用到的宏任务是 setTimeout，而微任务是 Promise.then
+注意这里是Promise.then,也就是说 new Promise在实例化的过程中所执行的代码是同步的，而在 then中注册的回调函数才是异步。
+
+
+也就是说，遇到异步函操作，还需要判断是宏任务还是微任务，宏任务的话，就把异步操作的结果加入宏任务队列，微任务的话，就加入到微任务队列。
+于是，异步到的队列，就由原来的一个事件队列，变成了宏队列和微队列两个，而主线程空了的话，会先去微队列中查找（若在这个过程中，微队列的事件又产生的新的微任务加入队尾，也会在本次循环中进行处理，简而言是就是把每轮循环把微队列搞空），然后再去宏队列中查找（同样的，把宏队列搞空）。
+
+
+
 //宏任务包括：
 //setInterval
 //setTimeout
@@ -1329,6 +1351,7 @@ this.onmessage = function (event) {
 //MutationObserver
 //Object.observe（已被弃用）
 
+//这是错的。。。。自己总结出错的来
 //本人自己总结下，没什么专业术语的那种
 //1.一开始是先执行宏任务，第一次是全部执行
 //2.第一次宏任务全部执行完后，就执行微任务，微任务也是全部执行完
