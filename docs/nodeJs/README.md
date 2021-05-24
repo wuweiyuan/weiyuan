@@ -71,7 +71,7 @@ npm install --save-dev cross-env
 //可以通过process.env.NODE_ENV修改
 ```
 
-## 为命中路由
+## 未命中路由
 ```js
     res.writeHeade(404,{"Content-type":"text-plain"})
     res.write("404 Not found/n")
